@@ -1,0 +1,21 @@
+/* src/fonts/fonts.css */
+
+@font-face {
+  font-family: 'Nunito';
+  src: url('./Nunito-Regular.woff2') format('woff2'),
+       url('./Nunito-Regular.woff') format('woff'),
+       url('./Nunito-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Add other weights if needed */
+@font-face {
+  font-family: 'Nunito';
+  src: url('./Nunito-Bold.woff2') format('woff2'),
+       url('./Nunito-Bold.woff') format('woff');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
