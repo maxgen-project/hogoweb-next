@@ -11,6 +11,7 @@ import FAQView from "./FAQView";
 import CtaView from "./CtaView";
 import InstagramView from "./InstagramView";
 import BeforeAfterView from "./BeforeAfterView";
+import DistributorCTA from "./DistributorCTA";
 import { useEffect, useState } from "react";
 import AutomotiveProductsView from "./AutomotiveProductsView";
 import AutomotiveFilmsCTA from "./AutomotiveFilmsCTAView";
@@ -117,7 +118,7 @@ export default function HomeHero() {
           />
         </div>
       </section>
-
+<DistributorCTA />
       {/* ABOUT SECTION */}
       <div
         className="py-16"

@@ -96,3 +96,81 @@ export default function InstagramView() {
     </section>
   );
 }
+
+
+// "use client";
+
+// import { useRef, useState, useEffect } from "react";
+// import { themes } from "../config/themeConfig";
+// import DecoratedTitle from "./DecoratedTitle";
+// import { FaInstagram } from "react-icons/fa";
+
+// export default function InstagramView({ posts }) {
+//   const sectionRef = useRef(null);
+//   const [visible, setVisible] = useState(false);
+
+//   useEffect(() => {
+//     const observer = new IntersectionObserver(
+//       ([entry]) => {
+//         if (entry.isIntersecting) {
+//           setVisible(true);
+//           observer.disconnect();
+//         }
+//       },
+//       { threshold: 0.3 },
+//     );
+//     if (sectionRef.current) observer.observe(sectionRef.current);
+//     return () => observer.disconnect();
+//   }, []);
+
+//   return (
+//     <section
+//       ref={sectionRef}
+//       className="py-24 overflow-hidden"
+//       style={{ backgroundColor: themes.backgroundGray }}
+//     >
+//       <div className="text-center mb-14 px-6">
+//         <div
+//           className={`transition-all duration-700 ease-out ${visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"}`}
+//         >
+//           <DecoratedTitle text="See Us at Instagram" color={themes.backgroundBlack} />
+//         </div>
+
+//         <h2
+//           className={`text-3xl md:text-5xl font-bold mt-6 transition-all duration-700 ease-out delay-150 ${visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"}`}
+//           style={{ color: themes.backgroundBlack }}
+//         >
+//           <a href="https://www.instagram.com/hogoautofilms_india?igsh=MTVldDk3cXF1c3kzbw==">
+//             @hogonnindia
+//           </a>
+//         </h2>
+//       </div>
+
+//       <div
+//         className={`grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-8 transition-all duration-700 ease-out delay-300 ${visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-20"}`}
+//       >
+//         {posts.map((post) => {
+//           const imageSrc = post.media_type === "VIDEO" ? post.thumbnail_url : post.media_url;
+//           return (
+            
+//               key={post.id}
+//               href={post.permalink}
+//               target="_blank"
+//               rel="noopener noreferrer"
+//               className="relative group overflow-hidden block"
+//             >
+//               <img
+//                 src={imageSrc}
+//                 alt={post.caption ? post.caption.slice(0, 60) : "Instagram post"}
+//                 className="w-full h-full object-cover aspect-square transition-transform duration-500 group-hover:scale-110"
+//               />
+//               <div className="absolute inset-0 flex items-center justify-center transition-opacity duration-300 group-hover:opacity-0">
+//                 <FaInstagram size={28} color="white" />
+//               </div>
+//             </a>
+//           );
+//         })}
+//       </div>
+//     </section>
+//   );
+// }

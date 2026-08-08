@@ -5,6 +5,9 @@ import { themes } from "../config/themeConfig";
 import DecoratedTitle from "../components/DecoratedTitle";
 import InnerBanner from "../components/InnerBanner";
 import ParallaxCarSection2 from "../components/ParallaxCarSection2";
+import WhatWeManufacture from "../components/about/WhatWeManufacture";
+import WayForward from "../components/about/WayForward";
+import FAQAboutView from "../components/about/FAQAboutView";
 
 const team3 = "/images/aboutpage1.jpeg";
 const aboutImg2 = "/images/aboutpage4.jpeg";
@@ -66,46 +69,37 @@ export default function About() {
           {/* RIGHT CONTENT */}
           <div className="text-center lg:text-left">
             <div className="flex justify-center lg:justify-start mb-12">
-              <DecoratedTitle text="ABOUT US" color={themes.backgroundBlack} />
+              <DecoratedTitle text="About HOGONN India Pvt. Ltd." color={themes.backgroundBlack} />
             </div>
 
             <p
               className="leading-relaxed mb-6 max-w-xl mx-auto lg:mx-0"
               style={{ color: themes.backgroundBlack }}
             >
-              Hogonn India Pvt. Ltd. is built on a strong legacy of over
-              46 years in the automotive industry. Since its inception in 1979,
-              the group has been driven by a clear vision to deliver uncompromised
-              quality and lasting value to customers.
+              HOGONN India Pvt. Ltd. is built on a legacy of over 46 years in the automotive industry. Since its inception in 1979, the group has been driven by a clear vision: to deliver uncompromised quality and lasting value to customers.
             </p>
 
             <p
               className="leading-relaxed mb-6 max-w-xl mx-auto lg:mx-0"
               style={{ color: themes.backgroundBlack }}
             >
-              With an unwavering focus on quality and consistency, the organization
-              established a strong presence across automotive accessories and auto
-              components. Over the years, it expanded its portfolio to include
-              premium seat covers, body covers, floor mats, steering covers, and a
-              wide range of auto components, serving both the aftermarket and
-              leading automobile manufacturers.
+              With an unwavering focus on quality and consistency, the organisation established a strong presence across automotive accessories and auto components — premium seat covers, body covers, floor mats, steering covers and a wide range of components, serving both the aftermarket and leading automobile manufacturers.
             </p>
             <p
               className="leading-relaxed mb-6 max-w-xl mx-auto lg:mx-0"
               style={{ color: themes.backgroundBlack }}
             >
-              This commitment to excellence has earned approvals from major OEMs
-              such as Maruti Suzuki, Hyundai Motor India, Mahindra & Mahindra, and
-              MG Motor reinforcing its reputation as a trusted partner for
-              high-quality automotive solutions.
+              That commitment to excellence in components and accessories has earned approvals from major OEMs including Maruti Suzuki, Hyundai Motor India, Mahindra & Mahindra, and MG Motor — reinforcing our reputation as a trusted manufacturing partner to India's automobile industry.
             </p>
           </div>
         </div>
       </section>
-
+      <WhatWeManufacture />
+      <WayForward />
       <section>
         <ParallaxCarSection2 />
       </section>
+      <FAQAboutView />
     </>
   );
 }

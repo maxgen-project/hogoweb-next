@@ -63,7 +63,7 @@ export default function NavbarView() {
     { label: "Gallery", path: "/gallery" },
     { label: "Product", path: "/product" },
     { label: "Warranty", path: "/#warranty" },
-    { label: "Media", path: "#" },
+    { label: "Media", path: "/media" },
     { label: "Our Team", path: "#" },
     { label: "Distributor", path: "/distributors" },
     { label: "Contact us", path: "/contact" },
