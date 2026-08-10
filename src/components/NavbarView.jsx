@@ -63,7 +63,7 @@ export default function NavbarView() {
     { label: "Gallery", path: "/gallery" },
     { label: "Product", path: "/product" },
     { label: "Warranty", path: "/#warranty" },
-    { label: "Media", path: "/media" },
+    { label: "Media", path: "/blog" },
     { label: "Our Team", path: "#" },
     { label: "Distributor", path: "/distributors" },
     { label: "Contact us", path: "/contact" },
@@ -73,9 +73,8 @@ export default function NavbarView() {
     <>
       {/* ================= NAVBAR ================= */}
       <nav
-        className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 pt-4 sm:pt-4 ${
-          scrolled ? "shadow-md" : ""
-        }`}
+        className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 pt-4 sm:pt-4 ${scrolled ? "shadow-md" : ""
+          }`}
         style={{
           backgroundColor: scrolled ? themes.sidebar : "transparent",
         }}
@@ -98,11 +97,10 @@ export default function NavbarView() {
                 <Link
                   key={item.label}
                   href={item.path}
-                  className={`relative font-medium transition-all ${
-                    isActive
-                      ? "text-[var(--primary)]"
-                      : "text-white hover:text-[var(--primary)]"
-                  }`}
+                  className={`relative font-medium transition-all ${isActive
+                    ? "text-[var(--primary)]"
+                    : "text-white hover:text-[var(--primary)]"
+                    }`}
                 >
                   {item.label}
                 </Link>
@@ -133,15 +131,13 @@ export default function NavbarView() {
               }}
             >
               <span
-                className={`block h-[2px] w-8 transition-all duration-300 origin-right ${
-                  scrolled ? "bg-white" : "bg-white"
-                } ${hovered ? "scale-x-70" : "scale-x-100"}`}
+                className={`block h-[2px] w-8 transition-all duration-300 origin-right ${scrolled ? "bg-white" : "bg-white"
+                  } ${hovered ? "scale-x-70" : "scale-x-100"}`}
               ></span>
 
               <span
-                className={`block h-[2px] w-8 transition-all duration-300 origin-left ${
-                  scrolled ? "bg-white" : "bg-white"
-                } ${hovered ? "scale-x-70" : "scale-x-100"}`}
+                className={`block h-[2px] w-8 transition-all duration-300 origin-left ${scrolled ? "bg-white" : "bg-white"
+                  } ${hovered ? "scale-x-70" : "scale-x-100"}`}
               ></span>
             </div>
           </div>
@@ -151,9 +147,8 @@ export default function NavbarView() {
       {/* MOBILE NAV MENU */}
       <div
         id="mobileNav"
-        className={`md:hidden fixed top-[70px] left-0 w-full z-40 ${
-          mobileMenu ? "block" : "hidden"
-        }`}
+        className={`md:hidden fixed top-[70px] left-0 w-full z-40 ${mobileMenu ? "block" : "hidden"
+          }`}
         style={{ backgroundColor: themes.sidebar }}
       >
         {navItems.map((item) => {
@@ -165,11 +160,10 @@ export default function NavbarView() {
               key={item.label}
               href={item.path}
               onClick={() => setMobileMenu(false)}
-              className={`block px-6 py-4 border-b border-white/10 transition ${
-                isActive
-                  ? "text-[var(--primary)] bg-white/5"
-                  : "text-white"
-              }`}
+              className={`block px-6 py-4 border-b border-white/10 transition ${isActive
+                ? "text-[var(--primary)] bg-white/5"
+                : "text-white"
+                }`}
             >
               {item.label}
             </Link>
@@ -179,9 +173,8 @@ export default function NavbarView() {
 
       {/* BACKDROP */}
       <div
-        className={`fixed inset-0 bg-black/60 z-40 transition-opacity ${
-          open ? "opacity-100 visible" : "opacity-0 invisible"
-        }`}
+        className={`fixed inset-0 bg-black/60 z-40 transition-opacity ${open ? "opacity-100 visible" : "opacity-0 invisible"
+          }`}
         onClick={() => setOpen(false)}
       ></div>
 
@@ -189,9 +182,8 @@ export default function NavbarView() {
       <div
         id="sidebar"
         className={`fixed top-0 right-0 h-full w-[75vw] sm:w-[380px] md:w-[400px]
-    z-50 shadow-2xl transition-transform duration-400 ${
-      open ? "translate-x-0" : "translate-x-full"
-    }`}
+    z-50 shadow-2xl transition-transform duration-400 ${open ? "translate-x-0" : "translate-x-full"
+          }`}
         style={{ backgroundColor: themes.backgroundBlack }}
       >
         <div className="h-full flex flex-col justify-between p-6 sm:p-8 overflow-y-auto hide-scrollbar">

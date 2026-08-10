@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState, useEffect } from "react";
+import Link from "next/link";
 import { themes } from "../config/themeConfig";
 import DecoratedTitle from "./DecoratedTitle";
 import RollingButton from "./RollingButton";
@@ -102,8 +103,15 @@ export default function BeforeAfterView() {
               enhance aesthetics, and deliver a flawless, showroom-like finish
               that keeps your vehicle looking brand new.
             </p>
-            <div className="mt-4">
+            <div className="mt-4 flex flex-wrap gap-4 items-center">
               <RollingButton text="View More" onClick={()=>location.href ='https://www.hogonnindia.com/gallery'} />
+              <Link
+                href="/blog/how-to-protect-car-scratches/"
+                className="text-sm font-semibold underline underline-offset-4 transition-colors duration-200 hover:opacity-80"
+                style={{ color: themes.primary }}
+              >
+                Read our guide: How to protect your car's paint →
+              </Link>
             </div>
           </div>
 
