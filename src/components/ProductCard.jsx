@@ -27,7 +27,7 @@ export default function ProductCard({ product }) {
   }, []);
 
   return (
-    <Link href={`/product/${product.id}`} className="block h-full w-full">
+    <Link href={`/product/${product.slug}`} className="block h-full w-full">
       <div
         ref={cardRef}
         className={`group rounded-xl overflow-hidden shadow-lg border border-white/20

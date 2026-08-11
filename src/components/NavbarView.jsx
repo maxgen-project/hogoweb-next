@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -16,15 +16,64 @@ import {
 } from "react-icons/fa";
 import { MdEmail } from "react-icons/md";
 
+import { getAllCategories } from "../service/productCategoryService";
+
 const logo = "/images/HOGONN9.png";
 
+const DEFAULT_CATEGORIES = [
+  {
+    name: "Paint Protection Film",
+    url: "/products/paint-protection-film/",
+    label: "6 Films",
+  },
+  {
+    name: "Safety Glaze Window Film",
+    url: "/products/safety-glaze-window-film/",
+    label: "2 Variants",
+  },
+  {
+    name: "Windshield PPF",
+    url: "/products/windshield-ppf/",
+    label: "1 Product",
+  },
+  {
+    name: "Sunroof PPF",
+    url: "/products/sunroof-ppf/",
+    label: "1 Product",
+  },
+];
+
 export default function NavbarView() {
+  const [categories, setCategories] = useState(DEFAULT_CATEGORIES);
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
   const [hovered, setHovered] = useState(false);
   const [mobileMenu, setMobileMenu] = useState(false);
+  const [productsDropdownOpen, setProductsDropdownOpen] = useState(false);
+  const [mobileProductsOpen, setMobileProductsOpen] = useState(false);
+  const dropdownRef = useRef(null);
 
   const pathname = usePathname();
+
+  useEffect(() => {
+    let isMounted = true;
+    getAllCategories()
+      .then((cats) => {
+        if (isMounted && Array.isArray(cats) && cats.length > 0) {
+          const mapped = cats.map((cat) => ({
+            name: cat.name,
+            url: cat.url || `/products/${cat.slug}/`,
+            label: cat.productCountLabel || `${cat.productCount || 1} Product`,
+          }));
+          setCategories(mapped);
+        }
+      })
+      .catch((err) => console.error("Navbar category fetch error:", err));
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -49,6 +98,11 @@ export default function NavbarView() {
       ) {
         setMobileMenu(false);
       }
+
+      // Close desktop products dropdown on outside click
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+        setProductsDropdownOpen(false);
+      }
     };
 
     document.addEventListener("mousedown", handleClickOutside);
@@ -69,6 +123,8 @@ export default function NavbarView() {
     { label: "Contact us", path: "/contact" },
   ];
 
+  const isProductsActive = pathname.startsWith("/products");
+
   return (
     <>
       {/* ================= NAVBAR ================= */}
@@ -88,7 +144,7 @@ export default function NavbarView() {
             />
           </Link>
 
-          <div className="hidden md:flex items-center gap-4 md:gap-6 lg:gap-10 xl:gap-12">
+          <div className="hidden md:flex items-center gap-4 md:gap-6 lg:gap-8 xl:gap-10">
             {navItems.map((item) => {
               const isHash = item.path.includes("#");
               const isActive = !isHash && pathname === item.path;
@@ -106,6 +162,82 @@ export default function NavbarView() {
                 </Link>
               );
             })}
+
+            {/* ── PRODUCTS DROPDOWN ───────────────────────── */}
+            <div
+              ref={dropdownRef}
+              className="relative"
+              onMouseEnter={() => setProductsDropdownOpen(true)}
+              onMouseLeave={() => setProductsDropdownOpen(false)}
+            >
+              <Link
+                href="/products/"
+                className={`relative font-medium transition-all flex items-center gap-1 ${isProductsActive
+                  ? "text-[var(--primary)]"
+                  : "text-white hover:text-[var(--primary)]"
+                  }`}
+                aria-haspopup="true"
+                aria-expanded={productsDropdownOpen}
+              >
+                Products
+                <span
+                  className={`text-xs transition-transform duration-200 ${productsDropdownOpen ? "rotate-180" : ""
+                    }`}
+                  aria-hidden="true"
+                >
+                  ▾
+                </span>
+              </Link>
+
+              {/* Dropdown panel */}
+              <div
+                className={`
+                  absolute top-full left-1/2 -translate-x-1/2 mt-2
+                  w-64 rounded-xl shadow-xl border border-white/10
+                  overflow-hidden
+                  transition-all duration-200 origin-top
+                  ${productsDropdownOpen
+                    ? "opacity-100 scale-y-100 pointer-events-auto"
+                    : "opacity-0 scale-y-95 pointer-events-none"
+                  }
+                `}
+                style={{ backgroundColor: themes.backgroundBlack }}
+                role="menu"
+              >
+                {/* All products link */}
+                <Link
+                  href="/products/"
+                  onClick={() => setProductsDropdownOpen(false)}
+                  className="block px-4 py-3 border-b border-white/10 text-xs font-semibold uppercase tracking-widest transition hover:bg-white/5"
+                  style={{ color: themes.primary }}
+                  role="menuitem"
+                >
+                  All Categories
+                </Link>
+                {categories.map((cat) => (
+                  <Link
+                    key={cat.url}
+                    href={cat.url}
+                    onClick={() => setProductsDropdownOpen(false)}
+                    className="flex items-center justify-between px-4 py-3 border-b border-white/5 transition hover:bg-white/5 group"
+                    role="menuitem"
+                  >
+                    <span
+                      className="text-sm font-medium transition group-hover:text-[var(--primary)]"
+                      style={{ color: "rgba(255,255,255,0.9)" }}
+                    >
+                      {cat.name}
+                    </span>
+                    <span
+                      className="text-xs ml-2 flex-shrink-0"
+                      style={{ color: "#666680" }}
+                    >
+                      {cat.label}
+                    </span>
+                  </Link>
+                ))}
+              </div>
+            </div>
           </div>
 
           <div className="flex items-center gap-3">
@@ -147,7 +279,7 @@ export default function NavbarView() {
       {/* MOBILE NAV MENU */}
       <div
         id="mobileNav"
-        className={`md:hidden fixed top-[70px] left-0 w-full z-40 ${mobileMenu ? "block" : "hidden"
+        className={`md:hidden fixed top-[70px] left-0 w-full z-40 max-h-[calc(100vh-70px)] overflow-y-auto ${mobileMenu ? "block" : "hidden"
           }`}
         style={{ backgroundColor: themes.sidebar }}
       >
@@ -169,6 +301,41 @@ export default function NavbarView() {
             </Link>
           );
         })}
+
+        {/* MOBILE PRODUCTS SECTION */}
+        <div className="border-b border-white/10">
+          <div
+            className="flex items-center justify-between px-6 py-4 cursor-pointer text-white hover:text-[var(--primary)] transition"
+            onClick={() => setMobileProductsOpen(!mobileProductsOpen)}
+          >
+            <span className={`font-medium ${isProductsActive ? "text-[var(--primary)]" : ""}`}>
+              Products Categories
+            </span>
+            <span className="text-xs">{mobileProductsOpen ? "▲" : "▼"}</span>
+          </div>
+
+          {mobileProductsOpen && (
+            <div className="bg-black/30 pb-2">
+              <Link
+                href="/products/"
+                onClick={() => setMobileMenu(false)}
+                className="block px-10 py-2.5 text-xs uppercase tracking-widest text-[var(--primary)] font-semibold"
+              >
+                All Categories
+              </Link>
+              {categories.map((cat) => (
+                <Link
+                  key={cat.url}
+                  href={cat.url}
+                  onClick={() => setMobileMenu(false)}
+                  className="block px-10 py-2.5 text-sm text-gray-300 hover:text-white transition"
+                >
+                  {cat.name}
+                </Link>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
 
       {/* BACKDROP */}
@@ -209,11 +376,18 @@ export default function NavbarView() {
 
             {/* ===== OUR SERVICE SECTION ===== */}
             <h3 className="text-white font-semibold mb-3">Our Products</h3>
-            <ul className="space-y-2 text-gray-300 mb-6">
-              <li>Paint Protection Film - Gloss/Matte/Color</li>
-              <li>Safety Glaze</li>
-              <li>Sunroof Protection Film</li>
-              <li>Windshield Protection Film</li>
+            <ul className="space-y-2 text-gray-300 mb-6 text-sm">
+              {categories.map((cat) => (
+                <li key={cat.url}>
+                  <Link
+                    href={cat.url}
+                    onClick={() => setOpen(false)}
+                    className="hover:text-[var(--primary)] transition block py-1"
+                  >
+                    {cat.name}
+                  </Link>
+                </li>
+              ))}
             </ul>
 
             <hr className="border-gray-700 mb-6" />

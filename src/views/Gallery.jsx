@@ -15,7 +15,7 @@ export default function Gallery() {
   const [galleryImages, setGalleryImages] = useState({ all: [] });
 
   useEffect(() => {
-    fetch("https://apidata.hogoautofilms.co.in/gallery/")
+    fetch("https://apidata.hogonnindia.com/gallery/")
       .then((res) => res.json())
       .then((data) => {
         if (data && data.data) {

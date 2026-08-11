@@ -1,7 +1,7 @@
 import axios from "axios";
 
 export const BASE =
-  process.env.NEXT_PUBLIC_API_BASE_URL || "https://apidata.hogoautofilms.co.in";
+  process.env.NEXT_PUBLIC_API_BASE_URL || "https://apidata.hogonnindia.com";
 
 export const apiInfo = axios.create({
   baseURL: BASE,

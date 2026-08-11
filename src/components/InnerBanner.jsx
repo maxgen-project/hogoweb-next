@@ -4,7 +4,8 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { themes } from "../config/themeConfig";
 
-export default function InnerBanner({ title, parent, parentLink, current, bg }) {
+export default function InnerBanner({ title, parent, parentLink, current, bg, isH1 = true }) {
+  const TitleTag = isH1 ? "h1" : "div";
   const [heroVisible, setHeroVisible] = useState(false);
   const heroRef = useRef(null);
 
@@ -44,12 +45,12 @@ export default function InnerBanner({ title, parent, parentLink, current, bg }) 
         }`}
       >
         {/* Title */}
-        <h1
+        <TitleTag
           className="text-2xl sm:text-3xl md:text-5xl font-bold leading-tight"
           style={{ color: themes.textWhite, fontFamily: themes.fontPrimary }}
         >
           {title}
-        </h1>
+        </TitleTag>
 
         {/* Divider */}
         <div className="w-full h-[1px] my-4 sm:my-6 bg-white/20" />

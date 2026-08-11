@@ -1,7 +1,10 @@
 "use client";
 
+import { useParams } from "next/navigation";
 import ProductDetails from "../../../src/views/ProductDetails";
 
-export default function ProductDetailPage({ params }) {
-  return <ProductDetails id={params.id} />;
+export default function ProductDetailPage() {
+  const { id } = useParams();
+
+  return <ProductDetails id={id} />;
 }

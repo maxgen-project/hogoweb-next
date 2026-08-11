@@ -46,6 +46,9 @@ export default function ProductDetails({ id }) {
     fetchProduct();
   }, [id]);
 
+useEffect(()=>{console.log('produc details' , product)},[product])
+
+
   if (!product) {
     return (
       <div
@@ -64,7 +67,6 @@ export default function ProductDetails({ id }) {
       </div>
     );
   }
-
   const specs = [
     {
       icon: <GiChemicalDrop />,

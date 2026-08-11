@@ -1,6 +1,8 @@
 "use client";
 
 import "./globals.css";
+import "./custom.css";
+
 import NavbarView from "../src/components/NavbarView";
 import FooterView from "../src/components/FooterView";
 import { usePathname } from "next/navigation";
