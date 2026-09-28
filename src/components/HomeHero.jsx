@@ -118,7 +118,7 @@ export default function HomeHero() {
           />
         </div>
       </section>
-<DistributorCTA />
+      <DistributorCTA />
       {/* ABOUT SECTION */}
       <div
         className="py-16"
@@ -163,7 +163,7 @@ export default function HomeHero() {
       <div className="" style={{ backgroundColor: themes.backgroundBlack }}>
         <FAQView />
       </div>
-      <AutomotiveFilmsCTA />
+      {/* <AutomotiveFilmsCTA /> */}
 
       {/* INSTAGRAM SECTION */}
       <div className="" style={{ backgroundColor: themes.backgroundBlack }}>

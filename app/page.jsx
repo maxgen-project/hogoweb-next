@@ -5,6 +5,7 @@ export const metadata = {
   description:
     "HOGONN manufactures premium quality paint protection film, Sunroof films, Window glaze and windshield films. Distributor enquiries welcome.",
 };
+
 export default function HomePage() {
   return <HomeHero />;
 }

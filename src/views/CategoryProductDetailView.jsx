@@ -45,7 +45,7 @@ export default function CategoryProductDetailView({ category, product }) {
             </li>
             <li style={{ color: "#666680" }}>›</li>
             <li>
-              <Link href="/products/" style={{ color: "#666680" }} className="hover:opacity-80 transition">
+              <Link href="/product" style={{ color: "#666680" }} className="hover:opacity-80 transition">
                 Products
               </Link>
             </li>

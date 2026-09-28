@@ -163,7 +163,10 @@ export default function TestimonialsView() {
           </div>
         </div>
       </div>
+
+
     </section>
+
   );
 }
 

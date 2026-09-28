@@ -99,42 +99,84 @@ export default function FAQView() {
           observer.disconnect();
         }
       },
-      { threshold: 0.3 }
+      { threshold: 0.2 }
     );
 
     if (sectionRef.current) observer.observe(sectionRef.current);
     return () => observer.disconnect();
   }, []);
 
+  const midIndex = Math.ceil(faqs.length / 2);
+  const leftFaqs = faqs.slice(0, midIndex);
+  const rightFaqs = faqs.slice(midIndex);
+
+  const renderFaqItem = (item, i) => (
+    <div
+      key={i}
+      className="border-b pb-6 cursor-pointer"
+      style={{ borderColor: themes.backgroundGray }}
+      onClick={() => setActive(active === i ? null : i)}
+    >
+      <div className="flex justify-between items-center gap-4">
+        <h3
+          className="text-lg font-medium"
+          style={{ color: themes.textWhite }}
+        >
+          {item.q}
+        </h3>
+
+        <span
+          className={`transition-transform duration-300 ${
+            active === i ? "rotate-180" : ""
+          }`}
+          style={{ color: themes.textWhite }}
+        >
+          ▼
+        </span>
+      </div>
+
+      <div
+        className={`overflow-hidden transition-all duration-300 ${
+          active === i ? "max-h-60 mt-4" : "max-h-0"
+        }`}
+      >
+        <p
+          className="leading-relaxed opacity-80 whitespace-pre-line text-sm sm:text-base"
+          style={{ color: themes.textWhite }}
+        >
+          {item.a}
+        </p>
+      </div>
+    </div>
+  );
+
   return (
     <section
       ref={sectionRef}
-      className="py-24"
+      className="py-16 sm:py-24"
       style={{ backgroundColor: themes.backgroundBlack }}
     >
-      <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-16">
-        <div>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6">
+        {/* TITLES AT TOP */}
+        <div className="text-center mb-12 sm:mb-16">
           <div
-            className={`
-              transition-all duration-700 ease-out
-              ${visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"}
-            `}
+            className={`transition-all duration-700 ease-out ${
+              visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
+            }`}
           >
             <DecoratedTitle
               text="EVERYTHING YOU NEED TO KNOW"
-              style={{ color: themes.backgroundBlack }}
+              color={themes.textWhite}
             />
           </div>
 
           <div
-            className={`
-              mt-4 transition-all duration-700 ease-out delay-150
-              ${visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"}
-            `}
+            className={`mt-6 transition-all duration-700 ease-out delay-150 ${
+              visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
+            }`}
           >
             <SectionHeading
               secondLine="Questions"
-              className="text-left mx-0"
               style={{ color: themes.textWhite }}
             >
               Frequently Asked
@@ -142,50 +184,20 @@ export default function FAQView() {
           </div>
         </div>
 
+        {/* 2-COLUMN FAQS BELOW */}
         <div
-          className={`
-            space-y-6
-            transition-all duration-900 ease-out delay-300
-            ${visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-20"}
-          `}
+          className={`grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 transition-all duration-900 ease-out delay-300 ${
+            visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
+          }`}
         >
-          {faqs.map((item, i) => (
-            <div
-              key={i}
-              className="border-b pb-6 cursor-pointer"
-              style={{ borderColor: themes.backgroundGray }}
-              onClick={() => setActive(active === i ? null : i)}
-            >
-              <div className="flex justify-between items-center gap-4">
-                <h3
-                  className="text-lg font-medium"
-                  style={{ color: themes.textWhite }}
-                >
-                  {item.q}
-                </h3>
-
-                <span
-                  className={`transition-transform duration-300 ${active === i ? "rotate-180" : ""
-                    }`}
-                  style={{ color: themes.textWhite }}
-                >
-                  ▼
-                </span>
-              </div>
-
-              <div
-                className={`overflow-hidden transition-all duration-300 ${active === i ? "max-h-40 mt-4" : "max-h-0"
-                  }`}
-              >
-                <p
-                  className="leading-relaxed opacity-80 whitespace-pre-line"
-                  style={{ color: themes.textWhite }}
-                >
-                  {item.a}
-                </p>
-              </div>
-            </div>
-          ))}
+          <div className="space-y-6">
+            {leftFaqs.map((item, index) => renderFaqItem(item, index))}
+          </div>
+          <div className="space-y-6">
+            {rightFaqs.map((item, index) =>
+              renderFaqItem(item, midIndex + index)
+            )}
+          </div>
         </div>
       </div>
     </section>

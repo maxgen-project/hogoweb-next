@@ -1,8 +1,26 @@
+/* ==========================================
+   HOGONN INDIA — CUSTOM CATEGORY & BLOG CSS
+   ========================================== */
+
 .hogonn-category-content {
     color: #ffffff;
-    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    line-height: 1.6;
-    padding: 30px 100px;
+    font-family: var(--font-primary, "Oxanium", system-ui, sans-serif);
+    line-height: 1.7;
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 2.5rem 1.5rem;
+}
+
+@media (min-width: 640px) {
+    .hogonn-category-content {
+        padding: 3rem 2rem;
+    }
+}
+
+@media (min-width: 1024px) {
+    .hogonn-category-content {
+        padding: 3.5rem 3rem;
+    }
 }
 
 .hogonn-category-content h1 {
@@ -10,7 +28,8 @@
     font-weight: 800;
     margin-bottom: 1.5rem;
     color: #ffffff;
-    border-bottom: 2px solid #e53e3e;
+    font-family: var(--font-primary, "Oxanium", sans-serif);
+    border-bottom: 2px solid #D20000;
     padding-bottom: 0.5rem;
 }
 
@@ -20,12 +39,19 @@
     }
 }
 
+/* Suppress the first h1 inside category description HTML —
+   the page H1 is already rendered by InnerBanner above the fold */
+.hogonn-category-content > h1:first-child {
+    display: none;
+}
+
 .hogonn-category-content h2 {
     font-size: 1.75rem;
     font-weight: 700;
     margin-top: 2.5rem;
     margin-bottom: 1.25rem;
     color: #ffffff;
+    font-family: var(--font-primary, "Oxanium", sans-serif);
 }
 
 @media (min-width: 640px) {
@@ -40,12 +66,14 @@
     margin-top: 1.5rem;
     margin-bottom: 0.75rem;
     color: #ffffff;
+    font-family: var(--font-primary, "Oxanium", sans-serif);
 }
 
 .hogonn-category-content p {
     color: #a0a0b8;
     margin-bottom: 1rem;
     font-size: 1rem;
+    line-height: 1.75;
 }
 
 .hogonn-section {
@@ -75,24 +103,26 @@
     border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 0.75rem;
     padding: 1.5rem;
-    transition: border-color 0.3s ease, transform 0.3s ease;
+    transition: border-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .hogonn-card:hover {
-    border-color: #e53e3e;
-    transform: translateY(-2px);
+    border-color: #D20000;
+    transform: translateY(-3px);
+    box-shadow: 0 10px 25px -5px rgba(210, 0, 0, 0.2);
 }
 
 .hogonn-card-badge {
     display: inline-block;
-    background-color: rgba(229, 62, 62, 0.15);
-    color: #e53e3e;
+    background-color: rgba(210, 0, 0, 0.15);
+    color: #D20000;
     font-size: 0.75rem;
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.05em;
     padding: 0.25rem 0.75rem;
     border-radius: 9999px;
+    border: 1px solid rgba(210, 0, 0, 0.3);
     margin-bottom: 0.75rem;
 }
 
@@ -100,7 +130,7 @@
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
-    background-color: #e53e3e;
+    background-color: #D20000;
     color: #ffffff;
     padding: 0.625rem 1.25rem;
     border-radius: 0.5rem;
@@ -108,13 +138,14 @@
     text-decoration: none;
     font-size: 0.875rem;
     margin-top: 1rem;
-    transition: opacity 0.3s ease;
+    transition: opacity 0.3s ease, background-color 0.3s ease;
 }
 
 .hogonn-btn:hover {
     opacity: 0.9;
     text-decoration: none;
     color: #ffffff;
+    background-color: #ED3434;
 }
 
 .hogonn-table-wrapper {
@@ -134,10 +165,13 @@
 }
 
 .hogonn-table th {
-    background-color: #e53e3e;
+    background-color: #D20000;
     color: #ffffff;
     padding: 0.875rem 1rem;
     font-weight: 700;
+    font-family: var(--font-primary, "Oxanium", sans-serif);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
 }
 
 .hogonn-table td {
@@ -164,13 +198,37 @@
 }
 
 .hogonn-tag {
-    background-color: rgba(229, 62, 62, 0.1);
-    border: 1px solid rgba(229, 62, 62, 0.3);
+    background-color: rgba(210, 0, 0, 0.1);
+    border: 1px solid rgba(210, 0, 0, 0.3);
     color: #ffffff;
     padding: 0.5rem 1rem;
     border-radius: 9999px;
     font-size: 0.875rem;
     font-weight: 500;
+}
+
+.hogonn-spec-chip {
+    background-color: #0a0a2a;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 0.75rem;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.hogonn-spec-label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #7e7e7e;
+    font-weight: 600;
+}
+
+.hogonn-spec-val {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #ffffff;
 }
 
 .hogonn-faq-item {
@@ -202,4 +260,204 @@
 
 .hogonn-faq-item summary h3 {
     display: inline;
+}
+
+
+/* ---- Page title ---- */
+.blog-hero-title {
+    font-family: var(--font-primary, "Oxanium", sans-serif);
+    color: var(--blog-text-white, #ffffff);
+    font-size: clamp(1.8rem, 4vw, 2.75rem);
+    font-weight: 700;
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 3rem 1.25rem 0;
+}
+
+.blog-hero-title::after {
+    content: "";
+    display: block;
+    width: 56px;
+    height: 3px;
+    background: #D20000;
+    margin-top: 1.25rem;
+    border-radius: 2px;
+}
+
+.blog-hero-meta {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 0 1.25rem 2.5rem;
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    color: #7e7e7e;
+    font-size: 0.85rem;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    margin-top: 1.25rem;
+    padding-bottom: 1.5rem;
+}
+
+/* ---- Body wrapper ---- */
+.blog-article {
+    font-family: var(--font-primary, "Oxanium", sans-serif);
+    color: #ffffff;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 2.5rem 1.25rem 5rem;
+    line-height: 1.75;
+    font-size: 1.05rem;
+}
+
+.blog-article p {
+    color: #a0a0b8;
+    margin: 0 0 1.5rem;
+}
+
+.blog-article h2 {
+    color: #ffffff;
+    font-size: clamp(1.35rem, 2.6vw, 1.65rem);
+    font-weight: 700;
+    line-height: 1.3;
+    margin: 3rem 0 1.25rem;
+    padding-left: 0.9rem;
+    border-left: 3px solid #D20000;
+}
+
+.blog-article h2:first-of-type {
+    margin-top: 0;
+}
+
+.blog-article h3 {
+    color: #ffffff;
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin: 2rem 0 0.75rem;
+}
+
+.blog-article a {
+    color: #D20000;
+    text-decoration: none;
+    border-bottom: 1px solid rgba(210, 0, 0, 0.35);
+    transition: border-color 0.2s ease, color 0.2s ease;
+}
+
+.blog-article a:hover {
+    color: #ED3434;
+    border-color: #ED3434;
+}
+
+.blog-article ul,
+.blog-article ol {
+    color: #a0a0b8;
+    margin: 0 0 1.5rem;
+    padding-left: 1.25rem;
+}
+
+.blog-article li {
+    margin-bottom: 0.5rem;
+}
+
+/* Pull-quote callout */
+.blog-article .blog-callout {
+    background: #07071a;
+    border-left: 3px solid #D20000;
+    border-radius: 4px;
+    padding: 1.25rem 1.5rem;
+    margin: 2rem 0;
+    color: #ffffff;
+    font-size: 1.1rem;
+    font-weight: 500;
+    line-height: 1.6;
+}
+
+/* CTA links */
+.blog-article .blog-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    border: 1px solid #D20000;
+    color: #ffffff !important;
+    background: transparent;
+    padding: 0.65rem 1.25rem;
+    border-radius: 999px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-decoration: none !important;
+    margin: 0.5rem 0.75rem 0.5rem 0;
+    transition: background 0.25s ease, color 0.25s ease;
+}
+
+.blog-article .blog-cta:hover {
+    background: #D20000;
+    color: #fff !important;
+}
+
+/* FAQ */
+.blog-article .blog-faq {
+    margin-top: 3rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    padding-top: 1.5rem;
+}
+
+.blog-article .blog-faq h2 {
+    margin-top: 0;
+}
+
+.blog-article details.blog-faq-item {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 1rem 0;
+}
+
+.blog-article details.blog-faq-item summary {
+    cursor: pointer;
+    list-style: none;
+    color: #ffffff;
+    font-weight: 600;
+    font-size: 1rem;
+    display: flex;
+    gap: 0.75rem;
+    align-items: baseline;
+}
+
+.blog-article details.blog-faq-item summary::-webkit-details-marker {
+    display: none;
+}
+
+.blog-article details.blog-faq-item summary::before {
+    content: "Q";
+    color: #D20000;
+    font-size: 0.85rem;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+
+.blog-article details.blog-faq-item summary::after {
+    content: "+";
+    margin-left: auto;
+    color: #7e7e7e;
+    transition: transform 0.2s ease;
+}
+
+.blog-article details.blog-faq-item[open] summary::after {
+    transform: rotate(45deg);
+}
+
+.blog-article details.blog-faq-item p {
+    margin: 0.75rem 0 0 1.6rem;
+    color: #a0a0b8;
+}
+
+@media (max-width: 640px) {
+
+    .blog-hero-title,
+    .blog-hero-meta,
+    .blog-article {
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
 }

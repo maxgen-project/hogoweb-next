@@ -3,16 +3,26 @@
 import { useEffect, useRef, useState } from "react";
 import { themes } from "../config/themeConfig";
 import { apiInfo } from "../service/api";
+import RollingButton from "./RollingButton";
+import { useRouter } from "next/navigation";
 
-export default function ShopSidebar({ setSelectedCategory }) {
+export default function ShopSidebar({ setSelectedCategory, setSelectedSlug }) {
   const [active, setActive] = useState("");
   const [visible, setVisible] = useState(false);
   const [categories, setCategories] = useState([]);
   const sidebarRef = useRef(null);
+  const router = useRouter();
 
   const handleCategory = (cat) => {
-    setActive(cat);
-    setSelectedCategory(cat);
+    if (cat) {
+      setActive(cat.name);
+      setSelectedCategory(cat.name);
+      setSelectedSlug(cat.slug || "");
+    } else {
+      setActive("");
+      setSelectedCategory("");
+      setSelectedSlug("");
+    }
   };
 
   // FETCH CATEGORY FROM API
@@ -48,9 +58,8 @@ export default function ShopSidebar({ setSelectedCategory }) {
   return (
     <div
       ref={sidebarRef}
-      className={`w-full lg:sticky lg:top-28 transition-all duration-700 ease-out ${
-        visible ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-10"
-      }`}
+      className={`w-full lg:sticky lg:top-28 transition-all duration-700 ease-out ${visible ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-10"
+        }`}
     >
       <div
         className="p-5 sm:p-6 rounded-xl border border-white/10 transition duration-300 hover:border-white/30"
@@ -68,12 +77,11 @@ export default function ShopSidebar({ setSelectedCategory }) {
               name="category"
               className="accent-red-500"
               defaultChecked
-              onChange={() => handleCategory("")}
+              onChange={() => handleCategory(null)}
             />
             <span
-              className={`transition-all duration-300 group-hover:text-white ${
-                active === "" ? "text-white font-semibold scale-105" : ""
-              }`}
+              className={`transition-all duration-300 group-hover:text-white ${active === "" ? "text-white font-semibold scale-105" : ""
+                }`}
             >
               All
             </span>
@@ -89,20 +97,25 @@ export default function ShopSidebar({ setSelectedCategory }) {
                 type="radio"
                 name="category"
                 className="accent-red-500"
-                onChange={() => handleCategory(cat.name)}
+                onChange={() => handleCategory(cat)}
               />
 
               <span
-                className={`transition-all duration-300 group-hover:text-white ${
-                  active === cat.name
+                className={`transition-all duration-300 group-hover:text-white ${active === cat.name
                     ? "text-white font-semibold scale-105"
                     : ""
-                }`}
+                  }`}
               >
                 {cat.name}
               </span>
             </label>
           ))}
+
+
+          <RollingButton
+            text="View Categories Details"
+            onClick={() => router.push("/product")}
+          />
         </div>
       </div>
     </div>

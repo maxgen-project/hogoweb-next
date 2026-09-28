@@ -2,26 +2,24 @@
 
 import { useEffect, useRef, useState } from "react";
 import InnerBanner from "../components/InnerBanner";
+import CategoryProductsSection from "../components/products/CategoryProductsSection";
 import CategoryCrossLinks from "../components/products/CategoryCrossLinks";
 import { themes } from "../config/themeConfig";
-import { getCrossLinks } from "../service/productCategoryService";
 import { sanitizeHtml } from "../utils/sanitizeHtml";
 
 const serviceBanner = "/images/serviceBanner.jpg";
 
 /**
- * CategoryDetailView — Renders a category page using the backend/CMS HTML description.
+ * CategoryDetailView — Renders a category page using the backend/CMS HTML description,
+ * followed by dynamic products belonging to the category, and category cross-links.
  *
- * The `category.description` field is the single source of truth for all page content
- * (intro, products, table, features, FAQs, etc.). It is rendered directly via
- * dangerouslySetInnerHTML after HTML sanitization.
- *
- * CategoryCrossLinks (links to other categories) are rendered below the description
- * by the frontend, since cross-links are structural navigation, not CMS content.
- *
- * @param {{ category: Object }} props
+ * @param {{ category: Object, products?: Array, crossLinks: Array }} props
  */
-export default function CategoryDetailView({ category }) {
+export default function CategoryDetailView({
+  category,
+  products = null,
+  crossLinks = [],
+}) {
   const contentRef = useRef(null);
   const [visible, setVisible] = useState(false);
 
@@ -38,8 +36,6 @@ export default function CategoryDetailView({ category }) {
     return () => observer.disconnect();
   }, []);
 
-  const crossLinks = getCrossLinks(category.slug);
-
   const hasH1InDescription =
     typeof category.description === "string" &&
     /(<h1\b[^>]*>)/i.test(category.description);
@@ -53,7 +49,7 @@ export default function CategoryDetailView({ category }) {
       <InnerBanner
         title={category.h1 || category.name}
         parent="Products"
-        parentLink="/products/"
+        parentLink="/product"
         current={category.name}
         bg={serviceBanner}
         isH1={!hasH1InDescription}
@@ -84,6 +80,12 @@ export default function CategoryDetailView({ category }) {
             </p>
           </section>
         )}
+
+        {/* ── DYNAMIC CATEGORY PRODUCTS ───────────────────────────────── */}
+        <CategoryProductsSection
+          category={category}
+          initialProducts={products}
+        />
 
         {/* ── CROSS LINKS ─────────────────────────────────────────────── */}
         <CategoryCrossLinks

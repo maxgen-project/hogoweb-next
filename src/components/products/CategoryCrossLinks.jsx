@@ -105,7 +105,7 @@ export default function CategoryCrossLinks({ crossLinks = [], currentSlug }) {
         {/* Back to all products */}
         <div className="mt-8 text-center">
           <Link
-            href="/products/"
+            href="/product"
             className="
               inline-flex items-center gap-2 text-sm font-medium
               transition-colors duration-200
@@ -113,7 +113,7 @@ export default function CategoryCrossLinks({ crossLinks = [], currentSlug }) {
             "
             style={{ color: "#a0a0b8" }}
           >
-            ← View All Product Categories
+            ← View All Products
           </Link>
         </div>
       </div>

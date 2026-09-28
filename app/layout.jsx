@@ -50,11 +50,11 @@ export default function RootLayout({ children }) {
           href="https://fonts.googleapis.com/css2?family=Oxanium:wght@400;500;600;700&display=swap"
           rel="stylesheet"
         />
-        <title>Hogonn India — Premium Auto Protection Films</title>
-        <meta
+        {/* <title>Hogonn India — Premium Auto Protection Films</title> */}
+        {/* <meta
           name="description"
           content="Hogonn India provides premium Paint Protection Films, Safety Glaze, Sunroof and Windshield Protection Films for your vehicle."
-        />
+        /> */}
       </head>
       <body className="min-h-screen bg-[var(--bg-secondary)] hide-scrollbar">
         <ScrollToTop />

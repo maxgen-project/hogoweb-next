@@ -2,24 +2,21 @@ import { notFound } from "next/navigation";
 import {
   getCategoryBySlug,
   getAllCategorySlugs,
+  getProductsForCategory,
+  getCrossLinks,
 } from "../../../src/service/productCategoryService";
 import CategoryDetailView from "../../../src/views/CategoryDetailView";
-import SchemaOrg, {
-  buildCollectionPageSchema,
-  buildProductSchema,
-  buildBreadcrumbSchema,
-  buildFAQSchema,
-} from "../../../src/components/products/SchemaOrg";
+import SchemaOrg from "../../../src/components/products/SchemaOrg";
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Static params for SSG (optional — removes the need for on-demand rendering)
+// Static params for SSG — resolved from the live API at build time
 // ─────────────────────────────────────────────────────────────────────────────
 export async function generateStaticParams() {
   return getAllCategorySlugs();
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Dynamic metadata per category
+// Dynamic metadata per category — driven entirely by API fields
 // ─────────────────────────────────────────────────────────────────────────────
 export async function generateMetadata({ params }) {
   const { category: slug } = await params;
@@ -31,20 +28,26 @@ export async function generateMetadata({ params }) {
     };
   }
 
-  const title = category.meta_title || category.metadata?.title || category.name;
-  const description = category.meta_description || category.metadata?.description || "";
-  const canonical = category.metadata?.canonical || `https://www.hogonnindia.com/products/${slug}/`;
+  // Use API fields with fallbacks; all may be empty strings
+  const title =
+    (category.meta_title && category.meta_title.trim()) ||
+    `${category.name} | HOGONN India`;
+
+  const description =
+    (category.meta_description && category.meta_description.trim()) || "";
+
+  const canonical = `https://www.hogonnindia.com/products/${slug}/`;
 
   return {
     title,
-    description,
-    keywords: category.meta_keywords || undefined,
-    alternates: {
-      canonical,
-    },
+    ...(description ? { description } : {}),
+    ...(category.meta_keywords && category.meta_keywords.trim()
+      ? { keywords: category.meta_keywords }
+      : {}),
+    alternates: { canonical },
     openGraph: {
       title,
-      description,
+      ...(description ? { description } : {}),
       url: canonical,
       siteName: "HOGONN India",
     },
@@ -56,49 +59,43 @@ export async function generateMetadata({ params }) {
 // ─────────────────────────────────────────────────────────────────────────────
 export default async function CategoryPage({ params }) {
   const { category: slug } = await params;
-  const category = await getCategoryBySlug(slug);
+
+  // Fetch category, products, and cross-links concurrently
+  const [category, products, crossLinks] = await Promise.all([
+    getCategoryBySlug(slug),
+    getProductsForCategory(slug),
+    getCrossLinks(slug),
+  ]);
 
   // Handle unknown or inactive category slugs — triggers Next.js 404
-  if (!category || category.status === false) {
+  if (!category || category.status !== true) {
     notFound();
   }
 
-  // Build schema array based on API schema or category type
+  // ── Build schema array ──────────────────────────────────────────────────────
+  // Use the safe-parsed schema object from the service (null if empty/invalid)
   const schemas = [];
 
-  if (category.schema) {
-    try {
-      const parsedSchema =
-        typeof category.schema === "string"
-          ? JSON.parse(category.schema)
-          : category.schema;
-      schemas.push(parsedSchema);
-    } catch (err) {
-      console.error("Failed to parse API schema JSON:", err);
-    }
-  } else {
-    if (category.type === "collection") {
-      schemas.push(buildCollectionPageSchema(category));
+  if (category.schemaParsed) {
+    // API provides a pre-built schema — use it directly
+    if (Array.isArray(category.schemaParsed)) {
+      schemas.push(...category.schemaParsed);
     } else {
-      schemas.push(buildProductSchema(category));
+      schemas.push(category.schemaParsed);
     }
-  }
-
-  if (category.breadcrumb) {
-    schemas.push(buildBreadcrumbSchema(category.breadcrumb));
-  }
-
-  if (category.faqs && category.faqs.length > 0) {
-    schemas.push(buildFAQSchema(category.faqs));
   }
 
   return (
     <>
-      {/* JSON-LD structured data */}
-      <SchemaOrg schemas={schemas} />
+      {/* JSON-LD structured data (only rendered if schemas array is non-empty) */}
+      {schemas.length > 0 && <SchemaOrg schemas={schemas} />}
 
-      {/* Category page view */}
-      <CategoryDetailView category={category} />
+      {/* Category page view — products & crossLinks fetched server-side */}
+      <CategoryDetailView
+        category={category}
+        products={products}
+        crossLinks={crossLinks}
+      />
     </>
   );
 }

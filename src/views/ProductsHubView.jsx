@@ -50,7 +50,7 @@ export default function ProductsHubView({ categories }) {
         className="py-12 sm:py-16"
         style={{ backgroundColor: "#07071a" }}
       >
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 text-center">
+        <div className="max-w-4xl mx-auto px-6 sm:px-8 md:px-12 text-center">
           <p
             className="text-base sm:text-lg leading-relaxed"
             style={{ color: "#a0a0b8" }}
@@ -67,7 +67,7 @@ export default function ProductsHubView({ categories }) {
       <section
         ref={sectionRef}
         className={`
-          max-w-7xl mx-auto px-4 sm:px-6
+          max-w-7xl mx-auto px-6 sm:px-8 md:px-12 lg:px-16
           py-12 sm:py-16 md:py-20
           transition-all duration-700 ease-out
           ${visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"}
@@ -75,7 +75,7 @@ export default function ProductsHubView({ categories }) {
       >
         <div className="mb-10 sm:mb-12 text-center">
           <h2
-            className="text-2xl sm:text-3xl md:text-4xl font-bold"
+            className="text-2xl sm:text-3xl md:text-4xl font-bold uppercase"
             style={{
               color: themes.textWhite,
               fontFamily: themes.fontPrimary,
@@ -101,7 +101,7 @@ export default function ProductsHubView({ categories }) {
         className="py-12 sm:py-16 border-t border-white/10"
         style={{ backgroundColor: "#07071a" }}
       >
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 text-center">
+        <div className="max-w-4xl mx-auto px-6 sm:px-8 md:px-12 text-center">
           <p
             className="text-sm sm:text-base leading-relaxed mb-6"
             style={{ color: "#a0a0b8" }}

@@ -1,253 +1,321 @@
 /**
  * HOGONN India — Centralized Product Category Service
  *
- * Provides API Integration with https://apidata.hogonnindia.com/category/
- * Handles frontend-to-backend slug mapping, category status filtering,
- * CMS HTML description fallbacks, and SEO metadata resolution.
+ * Fully dynamic — all category data comes from the backend API.
+ * No hardcoded category names, descriptions, slugs, or content.
+ *
+ * API: GET https://apidata.hogonnindia.com/category/
+ * API response: { "success": true, "count": N, "data": [...] }
+ *
+ * Category object fields used:
+ *   id, name, slug, description, breadcrumb, schema,
+ *   meta_title, meta_description, meta_keywords, hashtag, status
+ *
+ * NOTE: status is boolean (true = active, false = inactive).
+ * NOTE: breadcrumb, schema, meta_title, meta_description, meta_keywords, hashtag
+ *       may all be empty strings ("") — all are handled gracefully.
  */
-
-import { productCategories as staticCategories } from "../data/productCategories.js";
-import { CATEGORY_CMS_DESCRIPTIONS } from "../data/categoryCmsDescriptions.js";
 
 const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_BASE_URL || "https://apidata.hogonnindia.com";
 
 // ─────────────────────────────────────────────────────────────────────────────
-// SLUG MAPPING LAYER
-// ─────────────────────────────────────────────────────────────────────────────
-
-const FRONTEND_TO_BACKEND_SLUG_MAP = {
-  "paint-protection-film": "paint-protection-films",
-  "safety-glaze-window-film": "window-safety-glaze",
-  "windshield-ppf": "windshield-protection-film",
-  "sunroof-ppf": "sunroof-protection-film",
-};
-
-const BACKEND_TO_FRONTEND_SLUG_MAP = {
-  "paint-protection-films": "paint-protection-film",
-  "ppf-films": "paint-protection-film",
-  "window-safety-glaze": "safety-glaze-window-film",
-  "windshield-protection-film": "windshield-ppf",
-  "sunroof-protection-film": "sunroof-ppf",
-};
-
-export function mapFrontendToBackendSlug(frontendSlug) {
-  return FRONTEND_TO_BACKEND_SLUG_MAP[frontendSlug] || frontendSlug;
-}
-
-export function mapBackendToFrontendSlug(backendSlug) {
-  return BACKEND_TO_FRONTEND_SLUG_MAP[backendSlug] || backendSlug;
-}
-
-// Helper to get static category definition by frontend slug
-function getStaticCategory(frontendSlug) {
-  return staticCategories.find((cat) => cat.slug === frontendSlug);
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// API SERVICE METHODS
+// HELPERS
 // ─────────────────────────────────────────────────────────────────────────────
 
 /**
- * Fetch all active product categories.
- * Connects to GET https://apidata.hogonnindia.com/category/
+ * Strip HTML tags from a description string for use in card previews.
+ * Returns plain text up to `maxLen` characters.
+ * @param {string} html
+ * @param {number} maxLen
+ * @returns {string}
+ */
+function stripHtml(html, maxLen = 180) {
+  if (!html || typeof html !== "string") return "";
+  const text = html
+    .replace(/<[^>]+>/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+  return text.length > maxLen ? text.slice(0, maxLen).trimEnd() + "…" : text;
+}
+
+/**
+ * Safely parse a JSON-LD schema string from the backend.
+ * Handles:
+ *   1. Empty / blank string → return null
+ *   2. Valid JSON string → JSON.parse directly
+ *   3. Backslash-escaped JSON → unescape, then parse
+ *   4. Still fails → log a warning, return null (never throws)
+ *
+ * @param {string} schemaStr
+ * @returns {Object|null}
+ */
+function safeParseSchema(schemaStr) {
+  if (!schemaStr || !schemaStr.trim()) return null;
+
+  // Attempt 1: direct parse
+  try {
+    return JSON.parse(schemaStr);
+  } catch (_) {
+    // Attempt 2: unescape backslash-escaped quotes then parse
+    try {
+      const unescaped = schemaStr.replace(/\\"/g, '"').replace(/\\\\/g, "\\");
+      return JSON.parse(unescaped);
+    } catch (err) {
+      console.warn(
+        "[productCategoryService] Failed to parse schema JSON — skipping schema injection.",
+        err
+      );
+      return null;
+    }
+  }
+}
+
+/**
+ * Map a raw API category object to the shape used by the frontend.
+ * @param {Object} apiCat
+ * @returns {Object}
+ */
+function mapApiCategory(apiCat) {
+  const slug = apiCat.slug || String(apiCat.id);
+
+  return {
+    id: apiCat.id,
+    slug,
+    name: apiCat.name || "",
+    url: `/products/${slug}/`,
+
+    // Short preview for listing card — strip HTML from description
+    shortDescription: stripHtml(apiCat.description),
+
+    // Full HTML description for the detail page — render via dangerouslySetInnerHTML as-is
+    description: apiCat.description || "",
+
+    // Breadcrumb: keep as string (may be ""); the detail view handles empty fallback
+    breadcrumb: apiCat.breadcrumb || "",
+
+    // Schema: safe-parsed object, or null if empty / unparseable
+    schemaParsed: safeParseSchema(apiCat.schema || ""),
+
+    // SEO fields (all may be "")
+    meta_title: apiCat.meta_title || "",
+    meta_description: apiCat.meta_description || "",
+    meta_keywords: apiCat.meta_keywords || "",
+
+    // Hashtag (may be "")
+    hashtag: apiCat.hashtag || "",
+
+    // Status is boolean
+    status: apiCat.status === true,
+  };
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// FETCH ALL CATEGORIES
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * Fetch all active product categories from the API.
+ * Filters to status === true only.
+ *
+ * NOTE: The backend may return "PPF Films" and "Paint Protection Films" as
+ * separate entries — this is a known data quality issue to be resolved in the
+ * admin panel. Both are returned here as the API sends them.
  *
  * @returns {Promise<Array>}
  */
 export async function getAllCategories() {
   try {
     const response = await fetch(`${API_BASE_URL}/category/`, {
-      cache: "no-store", // or next: { revalidate: 60 }
+      next: { revalidate: 3600 },
     });
 
     if (!response.ok) {
-      throw new Error(`API error ${response.status}`);
+      throw new Error(`Category API error: HTTP ${response.status}`);
     }
 
     const json = await response.json();
 
     if (!json.success || !Array.isArray(json.data)) {
-      throw new Error("Invalid categories API response format");
+      throw new Error("Category API returned unexpected shape");
     }
 
-    // Filter active categories only
-    const activeApiCategories = json.data.filter(
-      (cat) => cat.status !== false
-    );
-
-    // Map API categories to frontend category structures
-    const categories = activeApiCategories
-      .map((apiCat) => {
-        const frontendSlug = mapBackendToFrontendSlug(apiCat.slug);
-        const staticCat = getStaticCategory(frontendSlug);
-
-        if (!staticCat) {
-          // If a new unknown category is returned by API, generate basic structure
-          return {
-            id: apiCat.id,
-            slug: frontendSlug,
-            apiSlug: apiCat.slug,
-            name: apiCat.name,
-            shortDescription: apiCat.meta_description || "",
-            productCount: 1,
-            productCountLabel: "1 Product",
-            url: `/products/${frontendSlug}/`,
-            status: apiCat.status,
-          };
-        }
-
-        return {
-          ...staticCat,
-          id: apiCat.id,
-          apiSlug: apiCat.slug,
-          slug: frontendSlug,
-          url: `/products/${frontendSlug}/`,
-          status: apiCat.status,
-          description:
-            apiCat.description && apiCat.description.trim().length > 0
-              ? apiCat.description
-              : CATEGORY_CMS_DESCRIPTIONS[frontendSlug] ||
-                staticCat.description ||
-                null,
-          meta_title: apiCat.meta_title || staticCat.metadata?.title,
-          meta_description:
-            apiCat.meta_description || staticCat.metadata?.description,
-          meta_keywords: apiCat.meta_keywords || null,
-          breadcrumb: apiCat.breadcrumb || staticCat.breadcrumb,
-          schema: apiCat.schema || staticCat.schema,
-          hashtag: apiCat.hashtag || null,
-        };
-      })
-      .filter(Boolean);
-
-    // Deduplicate by frontend slug to ensure 4 distinct category cards on /products/
-    const uniqueCategories = [];
-    const seenSlugs = new Set();
-
-    categories.forEach((cat) => {
-      if (!seenSlugs.has(cat.slug)) {
-        seenSlugs.add(cat.slug);
-        uniqueCategories.push(cat);
-      }
-    });
-
-    // Ensure all 4 core client-required categories exist in the list
-    staticCategories.forEach((staticCat) => {
-      if (!seenSlugs.has(staticCat.slug)) {
-        seenSlugs.add(staticCat.slug);
-        uniqueCategories.push({
-          ...staticCat,
-          description:
-            CATEGORY_CMS_DESCRIPTIONS[staticCat.slug] || staticCat.description,
-        });
-      }
-    });
-
-    return uniqueCategories;
+    // Filter active categories (status === true) and map to frontend shape
+    return json.data
+      .filter((cat) => cat.status === true)
+      .map(mapApiCategory);
   } catch (error) {
-    console.error("getAllCategories API call failed, using static fallback:", error);
-    // Fallback to static categories if API fails
-    return staticCategories.map((cat) => ({
-      ...cat,
-      description: CATEGORY_CMS_DESCRIPTIONS[cat.slug] || cat.description,
-    }));
+    console.error("[getAllCategories] API call failed:", error.message);
+    // Return empty array — the listing page will show an empty state or handle gracefully
+    return [];
   }
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// FETCH SINGLE CATEGORY BY SLUG
+// ─────────────────────────────────────────────────────────────────────────────
+
 /**
- * Fetch a single category by its frontend slug.
- * Resolves the backend slug, connects to GET https://apidata.hogonnindia.com/category/{backendSlug}/
+ * Fetch a single active category by its slug.
+ * Returns null if not found, inactive, or API errors.
  *
- * @param {string} frontendSlug
+ * @param {string} slug
  * @returns {Promise<Object|null>}
  */
-export async function getCategoryBySlug(frontendSlug) {
-  const staticCat = getStaticCategory(frontendSlug);
-  const backendSlug = mapFrontendToBackendSlug(frontendSlug);
+export async function getCategoryBySlug(slug) {
+  if (!slug) return null;
 
   try {
-    const response = await fetch(`${API_BASE_URL}/category/${backendSlug}/`, {
-      cache: "no-store",
+    // Fetch the full list and find by slug — avoids separate /category/{slug}/ endpoint
+    // which may not exist for all API configurations
+    const response = await fetch(`${API_BASE_URL}/category/`, {
+      next: { revalidate: 3600 },
     });
 
-    if (response.status === 404) {
-      if (staticCat) {
-        // Return static fallback if API 404s for a known frontend slug
-        return {
-          ...staticCat,
-          description:
-            CATEGORY_CMS_DESCRIPTIONS[frontendSlug] || staticCat.description,
-        };
-      }
-      return null;
-    }
-
     if (!response.ok) {
-      throw new Error(`API error ${response.status}`);
+      throw new Error(`Category API error: HTTP ${response.status}`);
     }
 
     const json = await response.json();
 
-    if (!json.success || !json.data) {
-      throw new Error("Invalid single category API response");
+    if (!json.success || !Array.isArray(json.data)) {
+      throw new Error("Category API returned unexpected shape");
     }
 
-    const apiCat = Array.isArray(json.data) ? json.data[0] : json.data;
-
-    // Check status
-    if (apiCat.status === false) {
-      return null;
-    }
-
-    const descriptionContent =
-      apiCat.description && apiCat.description.trim().length > 0
-        ? apiCat.description
-        : CATEGORY_CMS_DESCRIPTIONS[frontendSlug] || staticCat?.description;
-
-    return {
-      ...(staticCat || {}),
-      id: apiCat.id || staticCat?.id,
-      apiSlug: apiCat.slug,
-      slug: frontendSlug,
-      url: `/products/${frontendSlug}/`,
-      name: staticCat?.name || apiCat.name,
-      h1: staticCat?.h1 || apiCat.name,
-      status: apiCat.status,
-      description: descriptionContent,
-      meta_title: apiCat.meta_title || staticCat?.metadata?.title,
-      meta_description:
-        apiCat.meta_description || staticCat?.metadata?.description,
-      meta_keywords: apiCat.meta_keywords || null,
-      breadcrumb: apiCat.breadcrumb || staticCat?.breadcrumb,
-      schema: apiCat.schema || staticCat?.schema,
-      hashtag: apiCat.hashtag || null,
-      metadata: {
-        title: apiCat.meta_title || staticCat?.metadata?.title,
-        description:
-          apiCat.meta_description || staticCat?.metadata?.description,
-        canonical:
-          staticCat?.metadata?.canonical ||
-          `https://www.hogonnindia.com/products/${frontendSlug}/`,
-      },
-    };
-  } catch (error) {
-    console.error(
-      `getCategoryBySlug(${frontendSlug}) API call failed, using static fallback:`,
-      error
+    const apiCat = json.data.find(
+      (cat) =>
+        cat.slug === slug ||
+        (slug === "paint-protection-film" && cat.slug === "paint-protection-films") ||
+        (slug === "paint-protection-films" && cat.slug === "paint-protection-film")
     );
 
-    if (!staticCat) return null;
+    if (!apiCat) return null;
 
-    return {
-      ...staticCat,
-      description:
-        CATEGORY_CMS_DESCRIPTIONS[frontendSlug] || staticCat.description,
-    };
+    // Return null for inactive categories (triggers 404 in page component)
+    if (apiCat.status !== true) return null;
+
+    return mapApiCategory(apiCat);
+  } catch (error) {
+    console.error(`[getCategoryBySlug(${slug})] API call failed:`, error.message);
+    return null;
   }
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// FETCH PRODUCTS FOR A CATEGORY
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * Fetch all active products belonging to a specific category.
+ * Matches by category_id, category_name, or category slug.
+ *
+ * @param {Object|string|number} categoryInput
+ * @returns {Promise<Array>}
+ */
+export async function getProductsForCategory(categoryInput) {
+  if (!categoryInput) return [];
+
+  try {
+    const response = await fetch(`${API_BASE_URL}/products/sequence/?status=true`, {
+      next: { revalidate: 3600 },
+    });
+
+    if (!response.ok) {
+      throw new Error(`Products API error: HTTP ${response.status}`);
+    }
+
+    const json = await response.json();
+    const allProducts = Array.isArray(json.data) ? json.data : [];
+
+    let targetCatId = null;
+    let targetCatName = null;
+    let targetSlug = null;
+
+    if (typeof categoryInput === "object" && categoryInput !== null) {
+      targetCatId = categoryInput.id;
+      targetCatName = categoryInput.name;
+      targetSlug = categoryInput.slug;
+    } else if (typeof categoryInput === "number") {
+      targetCatId = categoryInput;
+    } else if (typeof categoryInput === "string") {
+      targetSlug = categoryInput;
+    }
+
+    return allProducts
+      .filter((p) => {
+        if (p.status !== true) return false;
+
+        // 1. Match by category_id
+        if (
+          targetCatId &&
+          (p.category_id === targetCatId || Number(p.category_id) === Number(targetCatId))
+        ) {
+          return true;
+        }
+
+        // 2. Match by category_name (case insensitive)
+        if (
+          targetCatName &&
+          p.category_name &&
+          p.category_name.trim().toLowerCase() === targetCatName.trim().toLowerCase()
+        ) {
+          return true;
+        }
+
+        // 3. Match by category slug heuristic
+        if (targetSlug) {
+          const normSlug = targetSlug.toLowerCase().replace(/s$/, "");
+          const pCatNameNorm = (p.category_name || "")
+            .toLowerCase()
+            .replace(/s$/, "")
+            .replace(/\s+/g, "-");
+          if (pCatNameNorm.includes(normSlug) || normSlug.includes(pCatNameNorm)) {
+            return true;
+          }
+        }
+
+        return false;
+      })
+      .sort((a, b) => {
+        const seqA = a.product_sequence ?? a.course_sequence ?? 9999;
+        const seqB = b.product_sequence ?? b.course_sequence ?? 9999;
+        return seqA - seqB;
+      });
+  } catch (error) {
+    console.error("[getProductsForCategory] API call failed:", error.message);
+    return [];
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// GENERATE STATIC PARAMS (for Next.js SSG)
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * Returns slug params for generateStaticParams on /products/[category].
+ * Falls back to empty array on API error (pages will be server-rendered on demand).
+ *
+ * @returns {Promise<Array<{category: string}>>}
+ */
+export async function getAllCategorySlugs() {
+  try {
+    const categories = await getAllCategories();
+    return categories.map((cat) => ({ category: cat.slug }));
+  } catch (error) {
+    console.error("[getAllCategorySlugs] Failed:", error.message);
+    return [];
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// PRODUCT-LEVEL HELPERS (retained for product detail pages)
+// ─────────────────────────────────────────────────────────────────────────────
+
 /**
  * Get a single product by category slug and product slug.
+ * @param {string} categorySlug
+ * @param {string} productSlug
+ * @returns {Promise<Object|undefined>}
  */
 export async function getProductBySlug(categorySlug, productSlug) {
   const category = await getCategoryBySlug(categorySlug);
@@ -256,42 +324,45 @@ export async function getProductBySlug(categorySlug, productSlug) {
 }
 
 /**
- * Get all category slugs for Next.js generateStaticParams
+ * Get all product slugs across all categories (for generateStaticParams on product detail pages).
+ * Falls back to empty array.
+ * @returns {Promise<Array<{category: string, product: string}>>}
  */
-export function getAllCategorySlugs() {
-  return staticCategories.map((cat) => ({ category: cat.slug }));
+export async function getAllProductSlugs() {
+  try {
+    const categories = await getAllCategories();
+    return categories.flatMap((cat) =>
+      (cat.products || []).map((product) => ({
+        category: cat.slug,
+        product: product.slug,
+      }))
+    );
+  } catch {
+    return [];
+  }
 }
 
 /**
- * Get all product slugs across all categories
+ * Get cross-links for a category.
+ * Since cross-links are no longer stored as static data, this returns
+ * the other active categories (excluding the current one), capped at 3.
+ * @param {string} currentSlug
+ * @returns {Promise<Array>}
  */
-export function getAllProductSlugs() {
-  return staticCategories.flatMap((cat) =>
-    (cat.products || []).map((product) => ({
-      category: cat.slug,
-      product: product.slug,
-    }))
-  );
-}
-
-/**
- * Get cross links for a category slug
- */
-export function getCrossLinks(slug) {
-  const staticCat = getStaticCategory(slug);
-  if (!staticCat || !staticCat.crossLinks) return [];
-  return staticCat.crossLinks
-    .map((crossSlug) => {
-      const linked = staticCategories.find((c) => c.slug === crossSlug);
-      if (!linked) return null;
-      return {
-        id: linked.id,
-        slug: linked.slug,
-        name: linked.name,
-        shortDescription: linked.shortDescription,
-        productCountLabel: linked.productCountLabel,
-        url: linked.url,
-      };
-    })
-    .filter(Boolean);
+export async function getCrossLinks(currentSlug) {
+  try {
+    const all = await getAllCategories();
+    return all
+      .filter((cat) => cat.slug !== currentSlug)
+      .slice(0, 3)
+      .map((cat) => ({
+        id: cat.id,
+        slug: cat.slug,
+        name: cat.name,
+        shortDescription: cat.shortDescription,
+        url: cat.url,
+      }));
+  } catch {
+    return [];
+  }
 }

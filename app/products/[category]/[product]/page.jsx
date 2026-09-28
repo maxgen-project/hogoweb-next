@@ -21,8 +21,8 @@ export async function generateStaticParams() {
 // ─────────────────────────────────────────────────────────────────────────────
 export async function generateMetadata({ params }) {
   const { category: categorySlug, product: productSlug } = await params;
-  const category = getCategoryBySlug(categorySlug);
-  const product = getProductBySlug(categorySlug, productSlug);
+  const category = await getCategoryBySlug(categorySlug);
+  const product = await getProductBySlug(categorySlug, productSlug);
 
   if (!category || !product) {
     return { title: "Product Not Found — HOGONN India" };
@@ -45,8 +45,8 @@ export async function generateMetadata({ params }) {
 export default async function ProductDetailPage({ params }) {
   const { category: categorySlug, product: productSlug } = await params;
 
-  const category = getCategoryBySlug(categorySlug);
-  const product = getProductBySlug(categorySlug, productSlug);
+  const category = await getCategoryBySlug(categorySlug);
+  const product = await getProductBySlug(categorySlug, productSlug);
 
   // Handle unknown slugs
   if (!category || !product) {

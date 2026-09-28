@@ -20,7 +20,7 @@ const products = [
     title: "Safety Glaze Window Films",
     description:
       "Advanced window protection films offering enhanced safety, heat rejection and a comfortable driving experience.",
-    href: "/products/window-film",
+    href: "/products/window-safety-glaze",
     image: "/images/products/window-film.jpg",
   },
   {
@@ -28,7 +28,7 @@ const products = [
     title: "Windshield Protection Film",
     description:
       "High-performance windshield protection film engineered to help protect your windshield from road debris and impact.",
-    href: "/products/windshield-film",
+    href: "/products/windshield-protection-film",
     image: "/images/products/windshield-film.jpg",
   },
   {
@@ -36,7 +36,7 @@ const products = [
     title: "Sunroof Protection Film",
     description:
       "Specialized sunroof films providing protection and improved comfort while maintaining the premium appearance of your vehicle.",
-    href: "/products/sunroof-film",
+    href: "/products/sunroof-protection-film",
     image: "/images/products/sunroof-film.jpg",
   },
 ];
@@ -82,11 +82,10 @@ export default function AutomotiveProducts() {
         <div
           className={`mb-14 flex flex-col gap-6 md:flex-row md:items-end md:justify-between
           transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)]
-          ${
-            visible
+          ${visible
               ? "translate-y-0 opacity-100"
               : "translate-y-10 opacity-0"
-          }`}
+            }`}
         >
           <div>
             <DecoratedTitle
@@ -128,11 +127,10 @@ export default function AutomotiveProducts() {
         <div
           className={`mt-12 flex justify-center
           transition-all duration-700 delay-500
-          ${
-            visible
+          ${visible
               ? "translate-y-0 opacity-100"
               : "translate-y-8 opacity-0"
-          }`}
+            }`}
         >
           {/* <RollingButton
             text="Explore All Products"
@@ -154,11 +152,10 @@ function ProductCard({ product, index, visible, onClick }) {
     <div
       className={`group relative min-h-[390px] overflow-hidden bg-[#151515]
       transition-all duration-700
-      ${
-        visible
+      ${visible
           ? "translate-y-0 opacity-100"
           : "translate-y-12 opacity-0"
-      }`}
+        }`}
       style={{
         transitionDelay: `${index * 120}ms`,
       }}

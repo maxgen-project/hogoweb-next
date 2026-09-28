@@ -11,6 +11,7 @@ const serviceBanner = "/images/serviceBanner.jpg";
 export default function ShopView() {
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState("");
+  const [selectedSlug, setSelectedSlug] = useState("");
 
   const sectionRef = useRef(null);
   const [visible, setVisible] = useState(false);
@@ -67,6 +68,7 @@ export default function ShopView() {
           <ShopSidebar
             categories={categories}
             setSelectedCategory={setSelectedCategory}
+            setSelectedSlug={setSelectedSlug}
           />
         </div>
 
@@ -74,6 +76,7 @@ export default function ShopView() {
         <div className="lg:col-span-3">
           <ProductGrid
             selectedCategory={selectedCategory}
+            selectedSlug={selectedSlug}
             setCategories={setCategories}
           />
         </div>

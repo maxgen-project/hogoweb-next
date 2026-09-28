@@ -1,10 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import ProductCard from "./ProductCard";
 import { apiInfo } from "../service/api";
+import { themes } from "../config/themeConfig";
 
-export default function ProductGrid({ selectedCategory, setCategories }) {
+export default function ProductGrid({ selectedCategory, selectedSlug, setCategories }) {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -61,6 +63,36 @@ export default function ProductGrid({ selectedCategory, setCategories }) {
   // UI
   return (
     <div className="w-full">
+      {/* ── HEADING ─────────────────────────────────────────────────── */}
+      {selectedCategory && selectedSlug ? (
+        <Link
+          href={`/products/${selectedSlug}`}
+          className="group inline-flex items-center gap-3 mb-6 no-underline"
+          style={{ textDecoration: "none" }}
+        >
+          <h1
+            className="text-2xl sm:text-3xl md:text-5xl font-bold leading-tight transition-colors duration-200 group-hover:text-red-500"
+            style={{ color: themes.textWhite, fontFamily: themes.fontPrimary }}
+          >
+            {selectedCategory}
+          </h1>
+          <span
+            className="text-xl sm:text-2xl md:text-4xl font-bold transition-all duration-300 translate-x-0 group-hover:translate-x-1"
+            style={{ color: themes.primary }}
+            aria-hidden="true"
+          >
+            ↗
+          </span>
+        </Link>
+      ) : (
+        <h1
+          className="text-2xl sm:text-3xl md:text-5xl font-bold leading-tight mb-6"
+          style={{ color: themes.textWhite, fontFamily: themes.fontPrimary }}
+        >
+          All Products
+        </h1>
+      )}
+
       <div
         className="
         grid

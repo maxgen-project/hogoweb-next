@@ -26,6 +26,16 @@ export default function ProductCard({ product }) {
     return () => observer.disconnect();
   }, []);
 
+  const imageUrl = product?.thumbnail_image
+    ? product.thumbnail_image.startsWith("http")
+      ? product.thumbnail_image
+      : `${BASE}${product.thumbnail_image}`
+    : "/images/serviceBanner.jpg";
+
+  const cleanedName = (product?.product_name || "")
+    .replace(/\s+/g, " ")
+    .trim();
+
   return (
     <Link href={`/product/${product.slug}`} className="block h-full w-full">
       <div
@@ -40,8 +50,8 @@ export default function ProductCard({ product }) {
         {/* Image - fixed height, prevents shrinking */}
         <div className="h-[200px] sm:h-[200px] md:h-[300px] overflow-hidden flex items-center justify-center bg-[#f7f7f7] flex-shrink-0">
           <img
-            src={`${BASE}${product.thumbnail_image}`}
-            alt={product.product_name}
+            src={imageUrl}
+            alt={cleanedName}
             className="max-h-full object-contain transition duration-500 group-hover:scale-110"
           />
         </div>
@@ -52,7 +62,7 @@ export default function ProductCard({ product }) {
           style={{ background: themes.backgroundBlack }}
         >
           <h3 className="text-sm sm:text-base md:text-lg font-semibold text-white leading-snug line-clamp-2 px-6">
-            {product.product_name}
+            {cleanedName}
           </h3>
         </div>
       </div>

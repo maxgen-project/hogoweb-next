@@ -46,7 +46,7 @@ export default function ProductDetails({ id }) {
     fetchProduct();
   }, [id]);
 
-useEffect(()=>{console.log('produc details' , product)},[product])
+  useEffect(() => { console.log('produc details', product) }, [product])
 
 
   if (!product) {

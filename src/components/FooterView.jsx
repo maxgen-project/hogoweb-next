@@ -95,10 +95,10 @@ export default function FooterView() {
       {/* SOCIAL ICONS */}
       <div className="flex justify-center gap-5 mt-10 flex-wrap">
         {[
-          { icon: facebookIcon, link: "#" },
-          { icon: twitterIcon, link: "#" },
-          { icon: youtubeIcon, link: "#" },
-          { icon: instagramIcon, link: "https://www.instagram.com/hogoautofilms_india" },
+          { icon: facebookIcon, link: "https://www.facebook.com/hogonnindia" },
+          { icon: twitterIcon, link: "https://x.com/hogonnindia" },
+          { icon: youtubeIcon, link: "https://www.youtube.com/@hogonnindia" },
+          { icon: instagramIcon, link: "https://www.instagram.com/hogonnindia/" },
           { icon: whatsappIcon, link: "#" },
         ].map((item, i) => (
           <a

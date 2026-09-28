@@ -20,7 +20,7 @@ export default function Shop() {
         const data = res.data && Array.isArray(res.data.data) ? res.data.data : [];
         setProducts(data);
         setFilteredProducts(data);
-        
+
         const cats = ["All", ...new Set(data.map(p => p.category).filter(Boolean))];
         setCategories(cats);
       } catch (err) {
@@ -41,10 +41,10 @@ export default function Shop() {
   }, [selectedCategory, products]);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen" style={{ backgroundColor: themes.backgroundBlack }}>
       <InnerBanner title="Shop" current="Shop" bg={serviceBanner} />
-      
-      <div className="container mx-auto px-4 py-8">
+
+      <div className="max-w-7xl mx-auto px-6 sm:px-8 md:px-12 py-12 sm:py-16 text-white">
         <div className="flex flex-col lg:flex-row gap-6">
           {/* Sidebar */}
           <div className="lg:w-1/4">

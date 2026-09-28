@@ -115,7 +115,7 @@ export default function NavbarView() {
     { label: "Home", path: "/" },
     { label: "About us", path: "/about" },
     { label: "Gallery", path: "/gallery" },
-    { label: "Product", path: "/product" },
+    { label: "Product", path: "/product", hasDropdown: true },
     { label: "Warranty", path: "/#warranty" },
     { label: "Media", path: "/blog" },
     { label: "Our Team", path: "#" },
@@ -123,7 +123,7 @@ export default function NavbarView() {
     { label: "Contact us", path: "/contact" },
   ];
 
-  const isProductsActive = pathname.startsWith("/products");
+  const isProductsActive = pathname.startsWith("/products") || pathname === "/product";
 
   return (
     <>
@@ -146,6 +146,74 @@ export default function NavbarView() {
 
           <div className="hidden md:flex items-center gap-4 md:gap-6 lg:gap-8 xl:gap-10">
             {navItems.map((item) => {
+              if (item.hasDropdown) {
+                return (
+                  <div
+                    key={item.label}
+                    ref={dropdownRef}
+                    className="relative py-2"
+                    onMouseEnter={() => setProductsDropdownOpen(true)}
+                    onMouseLeave={() => setProductsDropdownOpen(false)}
+                  >
+                    <Link
+                      href={item.path}
+                      className={`relative font-medium transition-all flex items-center gap-1 ${isProductsActive
+                        ? "text-[var(--primary)]"
+                        : "text-white hover:text-[var(--primary)]"
+                        }`}
+                      aria-haspopup="true"
+                      aria-expanded={productsDropdownOpen}
+                    >
+                      {item.label}
+                      <span
+                        className={`text-xs transition-transform duration-200 ${productsDropdownOpen ? "rotate-180" : ""
+                          }`}
+                        aria-hidden="true"
+                      >
+                        ▾
+                      </span>
+                    </Link>
+
+                    {/* Dropdown panel */}
+                    <div
+                      className={`
+                        absolute top-full left-1/2 -translate-x-1/2 pt-2
+                        w-64 z-50
+                        transition-all duration-200 origin-top
+                        ${productsDropdownOpen
+                          ? "opacity-100 scale-y-100 pointer-events-auto"
+                          : "opacity-0 scale-y-95 pointer-events-none"
+                        }
+                      `}
+                      role="menu"
+                    >
+                      <div
+                        className="rounded-xl shadow-xl border border-white/10 overflow-hidden"
+                        style={{ backgroundColor: themes.backgroundBlack }}
+                      >
+                        {categories.map((cat) => (
+                          <Link
+                            key={cat.url}
+                            href={cat.url}
+                            onClick={() => setProductsDropdownOpen(false)}
+                            className="flex items-center justify-between px-4 py-3 border-b border-white/5 transition hover:bg-white/5 group"
+                            role="menuitem"
+                          >
+                            <span
+                              className="text-sm font-medium transition group-hover:text-[var(--primary)]"
+                              style={{ color: "rgba(255,255,255,0.9)" }}
+                            >
+                              {cat.name}
+                            </span>
+
+                          </Link>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                );
+              }
+
               const isHash = item.path.includes("#");
               const isActive = !isHash && pathname === item.path;
 
@@ -162,82 +230,6 @@ export default function NavbarView() {
                 </Link>
               );
             })}
-
-            {/* ── PRODUCTS DROPDOWN ───────────────────────── */}
-            <div
-              ref={dropdownRef}
-              className="relative"
-              onMouseEnter={() => setProductsDropdownOpen(true)}
-              onMouseLeave={() => setProductsDropdownOpen(false)}
-            >
-              <Link
-                href="/products/"
-                className={`relative font-medium transition-all flex items-center gap-1 ${isProductsActive
-                  ? "text-[var(--primary)]"
-                  : "text-white hover:text-[var(--primary)]"
-                  }`}
-                aria-haspopup="true"
-                aria-expanded={productsDropdownOpen}
-              >
-                Products
-                <span
-                  className={`text-xs transition-transform duration-200 ${productsDropdownOpen ? "rotate-180" : ""
-                    }`}
-                  aria-hidden="true"
-                >
-                  ▾
-                </span>
-              </Link>
-
-              {/* Dropdown panel */}
-              <div
-                className={`
-                  absolute top-full left-1/2 -translate-x-1/2 mt-2
-                  w-64 rounded-xl shadow-xl border border-white/10
-                  overflow-hidden
-                  transition-all duration-200 origin-top
-                  ${productsDropdownOpen
-                    ? "opacity-100 scale-y-100 pointer-events-auto"
-                    : "opacity-0 scale-y-95 pointer-events-none"
-                  }
-                `}
-                style={{ backgroundColor: themes.backgroundBlack }}
-                role="menu"
-              >
-                {/* All products link */}
-                <Link
-                  href="/products/"
-                  onClick={() => setProductsDropdownOpen(false)}
-                  className="block px-4 py-3 border-b border-white/10 text-xs font-semibold uppercase tracking-widest transition hover:bg-white/5"
-                  style={{ color: themes.primary }}
-                  role="menuitem"
-                >
-                  All Categories
-                </Link>
-                {categories.map((cat) => (
-                  <Link
-                    key={cat.url}
-                    href={cat.url}
-                    onClick={() => setProductsDropdownOpen(false)}
-                    className="flex items-center justify-between px-4 py-3 border-b border-white/5 transition hover:bg-white/5 group"
-                    role="menuitem"
-                  >
-                    <span
-                      className="text-sm font-medium transition group-hover:text-[var(--primary)]"
-                      style={{ color: "rgba(255,255,255,0.9)" }}
-                    >
-                      {cat.name}
-                    </span>
-                    <span
-                      className="text-xs ml-2 flex-shrink-0"
-                      style={{ color: "#666680" }}
-                    >
-                      {cat.label}
-                    </span>
-                  </Link>
-                ))}
-              </div>
-            </div>
           </div>
 
           <div className="flex items-center gap-3">
@@ -284,6 +276,47 @@ export default function NavbarView() {
         style={{ backgroundColor: themes.sidebar }}
       >
         {navItems.map((item) => {
+          if (item.hasDropdown) {
+            return (
+              <div key={item.label} className="border-b border-white/10">
+                <div className="flex items-center justify-between px-6 py-4 transition text-white hover:text-[var(--primary)]">
+                  <Link
+                    href={item.path}
+                    onClick={() => setMobileMenu(false)}
+                    className={`font-medium ${isProductsActive ? "text-[var(--primary)]" : ""}`}
+                  >
+                    {item.label}
+                  </Link>
+                  <button
+                    type="button"
+                    className="text-xs p-2 text-gray-300 hover:text-white"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setMobileProductsOpen(!mobileProductsOpen);
+                    }}
+                  >
+                    {mobileProductsOpen ? "▲" : "▼"}
+                  </button>
+                </div>
+
+                {mobileProductsOpen && (
+                  <div className="bg-black/30 pb-2">
+                    {categories.map((cat) => (
+                      <Link
+                        key={cat.url}
+                        href={cat.url}
+                        onClick={() => setMobileMenu(false)}
+                        className="block px-10 py-2.5 text-sm text-gray-300 hover:text-white transition"
+                      >
+                        {cat.name}
+                      </Link>
+                    ))}
+                  </div>
+                )}
+              </div>
+            );
+          }
+
           const isHash = item.path.includes("#");
           const isActive = !isHash && pathname === item.path;
 
@@ -301,41 +334,6 @@ export default function NavbarView() {
             </Link>
           );
         })}
-
-        {/* MOBILE PRODUCTS SECTION */}
-        <div className="border-b border-white/10">
-          <div
-            className="flex items-center justify-between px-6 py-4 cursor-pointer text-white hover:text-[var(--primary)] transition"
-            onClick={() => setMobileProductsOpen(!mobileProductsOpen)}
-          >
-            <span className={`font-medium ${isProductsActive ? "text-[var(--primary)]" : ""}`}>
-              Products Categories
-            </span>
-            <span className="text-xs">{mobileProductsOpen ? "▲" : "▼"}</span>
-          </div>
-
-          {mobileProductsOpen && (
-            <div className="bg-black/30 pb-2">
-              <Link
-                href="/products/"
-                onClick={() => setMobileMenu(false)}
-                className="block px-10 py-2.5 text-xs uppercase tracking-widest text-[var(--primary)] font-semibold"
-              >
-                All Categories
-              </Link>
-              {categories.map((cat) => (
-                <Link
-                  key={cat.url}
-                  href={cat.url}
-                  onClick={() => setMobileMenu(false)}
-                  className="block px-10 py-2.5 text-sm text-gray-300 hover:text-white transition"
-                >
-                  {cat.name}
-                </Link>
-              ))}
-            </div>
-          )}
-        </div>
       </div>
 
       {/* BACKDROP */}
@@ -420,7 +418,7 @@ export default function NavbarView() {
               className=""
               onClick={() =>
                 window.open(
-                  "https://distributor.hogoautofilms.co.in/",
+                  "https://distributor.hogonnindia.com/",
                   "_blank"
                 )
               }
