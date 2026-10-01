@@ -15,15 +15,54 @@ import DistributorCTA from "./DistributorCTA";
 import { useEffect, useState } from "react";
 import AutomotiveProductsView from "./AutomotiveProductsView";
 import AutomotiveFilmsCTA from "./AutomotiveFilmsCTAView";
-const car = "/images/2.png";
+import { apiInfo, BASE } from "../service/api";
+
+const fallbackCar = "/images/2.png";
+const fallbackTitle = "Paint Protection Film Manufactured in India";
+const fallbackSubtitle = "Ultimate Shield for Your Car's Protection";
 const websiteBackground = "/images/Homepage-background.png";
 
 export default function HomeHero() {
   const [animate, setAnimate] = useState(false);
   const [quoteOpen, setQuoteOpen] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [carImage, setCarImage] = useState(fallbackCar);
+  const [title, setTitle] = useState(fallbackTitle);
+  const [subtitle, setSubtitle] = useState(fallbackSubtitle);
 
   useEffect(() => {
     setAnimate(true);
+
+    apiInfo
+      .get("/banner/")
+      .then((res) => {
+        const banners = res.data?.data;
+        if (Array.isArray(banners) && banners.length > 0) {
+          const activeBanner = banners.find(
+            (b) => b?.status === true || b?.status === "true"
+          );
+          if (activeBanner) {
+            if (activeBanner.image) {
+              const fullUrl = activeBanner.image.startsWith("http")
+                ? activeBanner.image
+                : `${BASE}${activeBanner.image}`;
+              setCarImage(fullUrl);
+            }
+            if (activeBanner.title && activeBanner.title.trim()) {
+              setTitle(activeBanner.title.trim());
+            }
+            if (activeBanner.subtitle && activeBanner.subtitle.trim()) {
+              setSubtitle(activeBanner.subtitle.trim());
+            }
+          }
+        }
+      })
+      .catch((err) => {
+        console.error("Error fetching hero banner:", err);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
   }, []);
 
   return (
@@ -67,7 +106,7 @@ export default function HomeHero() {
           ${animate ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"}
         `}
           >
-            Paint Protection Film Manufactured in India
+            {title}
           </h1>
 
           {/* PARAGRAPH */}
@@ -83,7 +122,7 @@ export default function HomeHero() {
               color: themes.textWhite,
             }}
           >
-            Ultimate Shield for Your Car's Protection
+            {subtitle}
           </p>
 
           {/* BUTTON */}
@@ -101,21 +140,38 @@ export default function HomeHero() {
           </div>
         </div>
 
-        {/* CAR IMAGE */}
-        <div className="relative w-full flex justify-center mt-8">
-          <img
-            src={car}
-            alt="Car"
-            className="
-      w-[95%]
-      sm:w-[90%]
-      md:w-[85%]
-      lg:w-[80%]
-      max-w-[1304px]
-      h-auto
-      object-contain
-    "
-          />
+        {/* CAR IMAGE / LOADER */}
+        <div className="relative w-full flex justify-center items-center mt-8 min-h-[220px] sm:min-h-[350px] md:min-h-[440px]">
+          {loading ? (
+            <div className="flex flex-col items-center justify-center py-16">
+              <div
+                className="w-12 h-12 sm:w-16 sm:h-16 rounded-full border-4 animate-spin"
+                style={{
+                  borderColor: themes.primary,
+                  borderTopColor: "transparent",
+                }}
+              />
+            </div>
+          ) : (
+            <img
+              src={carImage}
+              onError={() => {
+                if (carImage !== fallbackCar) {
+                  setCarImage(fallbackCar);
+                }
+              }}
+              alt="Car"
+              className="
+        w-[95%]
+        sm:w-[90%]
+        md:w-[85%]
+        lg:w-[80%]
+        max-w-[1304px]
+        h-auto
+        object-contain
+      "
+            />
+          )}
         </div>
       </section>
       <DistributorCTA />

@@ -7,7 +7,7 @@ import InnerBanner from "../components/InnerBanner";
 import { BASE } from "../service/api";
 import { BLOG_POSTS, BLOG_CATEGORIES } from "../data/blogData";
 
-const blogBanner = "/images/blogBanner.jpg";
+const blogBanner = "/images/serviceBanner.jpg";
 
 /**
  * @typedef {Object} Blog

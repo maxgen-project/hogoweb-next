@@ -7,7 +7,7 @@ import InnerBanner from "../components/InnerBanner";
 import { apiInfo } from "../service/api";
 import { FaMapMarkerAlt } from "react-icons/fa";
 
-const distributorBanner = "/images/aboutBannerImg.png";
+const distributorBanner = "/images/serviceBanner.jpg";
 
 export default function Distributors() {
   const [distributors, setDistributors] = useState([]);
@@ -66,10 +66,10 @@ export default function Distributors() {
 
   return (
     <div className="min-h-screen pb-20" style={{ backgroundColor: themes.backgroundBlack }}>
-      <InnerBanner 
-        title="Our Distributors" 
-        current="Distributors" 
-        bg={distributorBanner} 
+      <InnerBanner
+        title="Our Distributors"
+        current="Distributors"
+        bg={distributorBanner}
       />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 mt-16 sm:mt-24">
@@ -89,8 +89,8 @@ export default function Distributors() {
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
             {statesData.map((stateItem, index) => (
-              <Link 
-                key={stateItem.name} 
+              <Link
+                key={stateItem.name}
                 href="/contact"
                 className="group relative flex flex-col justify-between overflow-hidden bg-white/[0.03] backdrop-blur-md border border-white/10 rounded-2xl p-6 sm:p-8 transition-all duration-300 hover:border-[var(--primary)] hover:shadow-[0_10px_30px_rgba(210,0,0,0.15)] hover:-translate-y-2 animate-fadeIn cursor-pointer"
                 style={{ animationDelay: `${index * 50}ms` }}
@@ -104,7 +104,7 @@ export default function Distributors() {
                     <span className="p-3 w-fit rounded-xl bg-white/[0.05] border border-white/10 text-[var(--primary)] group-hover:bg-[var(--primary)]/10 group-hover:text-[var(--primary)] transition-colors duration-300">
                       <FaMapMarkerAlt className="text-xl sm:text-2xl" />
                     </span>
-                    <h3 
+                    <h3
                       className="text-2xl sm:text-3xl font-bold text-white tracking-wide mt-2 group-hover:text-[var(--primary)] transition-colors duration-300"
                       style={{ fontFamily: themes.fontPrimary }}
                     >

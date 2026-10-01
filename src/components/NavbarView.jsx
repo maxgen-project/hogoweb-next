@@ -43,6 +43,11 @@ const DEFAULT_CATEGORIES = [
   },
 ];
 
+const MEDIA_ITEMS = [
+  { name: "Blog", url: "/blog" },
+  { name: "Gallery", url: "/gallery" },
+];
+
 export default function NavbarView() {
   const [categories, setCategories] = useState(DEFAULT_CATEGORIES);
   const [scrolled, setScrolled] = useState(false);
@@ -51,7 +56,11 @@ export default function NavbarView() {
   const [mobileMenu, setMobileMenu] = useState(false);
   const [productsDropdownOpen, setProductsDropdownOpen] = useState(false);
   const [mobileProductsOpen, setMobileProductsOpen] = useState(false);
-  const dropdownRef = useRef(null);
+  const productsDropdownRef = useRef(null);
+
+  const [mediaDropdownOpen, setMediaDropdownOpen] = useState(false);
+  const [mobileMediaOpen, setMobileMediaOpen] = useState(false);
+  const mediaDropdownRef = useRef(null);
 
   const pathname = usePathname();
 
@@ -99,9 +108,12 @@ export default function NavbarView() {
         setMobileMenu(false);
       }
 
-      // Close desktop products dropdown on outside click
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+      // Close desktop dropdowns on outside click
+      if (productsDropdownRef.current && !productsDropdownRef.current.contains(e.target)) {
         setProductsDropdownOpen(false);
+      }
+      if (mediaDropdownRef.current && !mediaDropdownRef.current.contains(e.target)) {
+        setMediaDropdownOpen(false);
       }
     };
 
@@ -114,16 +126,16 @@ export default function NavbarView() {
   const navItems = [
     { label: "Home", path: "/" },
     { label: "About us", path: "/about" },
-    { label: "Gallery", path: "/gallery" },
-    { label: "Product", path: "/product", hasDropdown: true },
+    { label: "Product", path: "/product", dropdownType: "products" },
     { label: "Warranty", path: "/#warranty" },
-    { label: "Media", path: "/blog" },
+    { label: "Media", path: "/blog", dropdownType: "media" },
     { label: "Our Team", path: "#" },
     { label: "Distributor", path: "/distributors" },
     { label: "Contact us", path: "/contact" },
   ];
 
   const isProductsActive = pathname.startsWith("/products") || pathname === "/product";
+  const isMediaActive = pathname.startsWith("/blog") || pathname === "/gallery";
 
   return (
     <>
@@ -146,11 +158,11 @@ export default function NavbarView() {
 
           <div className="hidden md:flex items-center gap-4 md:gap-6 lg:gap-8 xl:gap-10">
             {navItems.map((item) => {
-              if (item.hasDropdown) {
+              if (item.dropdownType === "products") {
                 return (
                   <div
                     key={item.label}
-                    ref={dropdownRef}
+                    ref={productsDropdownRef}
                     className="relative py-2"
                     onMouseEnter={() => setProductsDropdownOpen(true)}
                     onMouseLeave={() => setProductsDropdownOpen(false)}
@@ -205,7 +217,73 @@ export default function NavbarView() {
                             >
                               {cat.name}
                             </span>
+                          </Link>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                );
+              }
 
+              if (item.dropdownType === "media") {
+                return (
+                  <div
+                    key={item.label}
+                    ref={mediaDropdownRef}
+                    className="relative py-2"
+                    onMouseEnter={() => setMediaDropdownOpen(true)}
+                    onMouseLeave={() => setMediaDropdownOpen(false)}
+                  >
+                    <Link
+                      href={item.path}
+                      className={`relative font-medium transition-all flex items-center gap-1 ${isMediaActive
+                        ? "text-[var(--primary)]"
+                        : "text-white hover:text-[var(--primary)]"
+                        }`}
+                      aria-haspopup="true"
+                      aria-expanded={mediaDropdownOpen}
+                    >
+                      {item.label}
+                      <span
+                        className={`text-xs transition-transform duration-200 ${mediaDropdownOpen ? "rotate-180" : ""
+                          }`}
+                        aria-hidden="true"
+                      >
+                        ▾
+                      </span>
+                    </Link>
+
+                    {/* Dropdown panel */}
+                    <div
+                      className={`
+                        absolute top-full left-1/2 -translate-x-1/2 pt-2
+                        w-52 z-50
+                        transition-all duration-200 origin-top
+                        ${mediaDropdownOpen
+                          ? "opacity-100 scale-y-100 pointer-events-auto"
+                          : "opacity-0 scale-y-95 pointer-events-none"
+                        }
+                      `}
+                      role="menu"
+                    >
+                      <div
+                        className="rounded-xl shadow-xl border border-white/10 overflow-hidden"
+                        style={{ backgroundColor: themes.backgroundBlack }}
+                      >
+                        {MEDIA_ITEMS.map((sub) => (
+                          <Link
+                            key={sub.url}
+                            href={sub.url}
+                            onClick={() => setMediaDropdownOpen(false)}
+                            className="flex items-center justify-between px-4 py-3 border-b border-white/5 transition hover:bg-white/5 group"
+                            role="menuitem"
+                          >
+                            <span
+                              className="text-sm font-medium transition group-hover:text-[var(--primary)]"
+                              style={{ color: "rgba(255,255,255,0.9)" }}
+                            >
+                              {sub.name}
+                            </span>
                           </Link>
                         ))}
                       </div>
@@ -276,7 +354,7 @@ export default function NavbarView() {
         style={{ backgroundColor: themes.sidebar }}
       >
         {navItems.map((item) => {
-          if (item.hasDropdown) {
+          if (item.dropdownType === "products") {
             return (
               <div key={item.label} className="border-b border-white/10">
                 <div className="flex items-center justify-between px-6 py-4 transition text-white hover:text-[var(--primary)]">
@@ -309,6 +387,47 @@ export default function NavbarView() {
                         className="block px-10 py-2.5 text-sm text-gray-300 hover:text-white transition"
                       >
                         {cat.name}
+                      </Link>
+                    ))}
+                  </div>
+                )}
+              </div>
+            );
+          }
+
+          if (item.dropdownType === "media") {
+            return (
+              <div key={item.label} className="border-b border-white/10">
+                <div className="flex items-center justify-between px-6 py-4 transition text-white hover:text-[var(--primary)]">
+                  <Link
+                    href={item.path}
+                    onClick={() => setMobileMenu(false)}
+                    className={`font-medium ${isMediaActive ? "text-[var(--primary)]" : ""}`}
+                  >
+                    {item.label}
+                  </Link>
+                  <button
+                    type="button"
+                    className="text-xs p-2 text-gray-300 hover:text-white"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setMobileMediaOpen(!mobileMediaOpen);
+                    }}
+                  >
+                    {mobileMediaOpen ? "▲" : "▼"}
+                  </button>
+                </div>
+
+                {mobileMediaOpen && (
+                  <div className="bg-black/30 pb-2">
+                    {MEDIA_ITEMS.map((sub) => (
+                      <Link
+                        key={sub.url}
+                        href={sub.url}
+                        onClick={() => setMobileMenu(false)}
+                        className="block px-10 py-2.5 text-sm text-gray-300 hover:text-white transition"
+                      >
+                        {sub.name}
                       </Link>
                     ))}
                   </div>

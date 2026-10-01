@@ -28,10 +28,10 @@ export default function FooterView() {
       });
   }, []);
 
-  const handleProductClick = (id) => {
+  const handleProductClick = (slug) => {
     window.scrollTo({ top: 0, behavior: "smooth" });
     setTimeout(() => {
-      router.push(`/product/${id}`);
+      router.push(`/product/${slug}`);
     }, 300);
   };
 
@@ -63,15 +63,27 @@ export default function FooterView() {
         <div className="text-center">
           <h3 className="mb-4 font-semibold">Our Products</h3>
           <ul className="space-y-2">
-            {products.slice(0, 5).map((p) => (
-              <li
-                key={p.id}
-                className="cursor-pointer opacity-80 hover:text-red-500"
-                onClick={() => handleProductClick(p.id)}
-              >
-                {p.product_name}
-              </li>
-            ))}
+            {products.slice(0, 5).map((p) => {
+              const productSlug = p.slug || p.id;
+              return (
+                <li
+                  key={p.id}
+                  className="cursor-pointer opacity-80 hover:text-red-500 transition-colors"
+                  onClick={() => handleProductClick(productSlug)}
+                >
+                  <Link
+                    href={`/product/${productSlug}`}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      handleProductClick(productSlug);
+                    }}
+                    className="hover:text-red-500 transition-colors"
+                  >
+                    {p.product_name}
+                  </Link>
+                </li>
+              );
+            })}
           </ul>
         </div>
 
@@ -79,15 +91,27 @@ export default function FooterView() {
         <div className="text-center">
           <h3 className="mb-4 font-semibold">Our Products</h3>
           <ul className="space-y-2">
-            {products.slice(5, 10).map((p) => (
-              <li
-                key={p.id}
-                className="cursor-pointer opacity-80 hover:text-red-500"
-                onClick={() => handleProductClick(p.id)}
-              >
-                {p.product_name}
-              </li>
-            ))}
+            {products.slice(5, 10).map((p) => {
+              const productSlug = p.slug || p.id;
+              return (
+                <li
+                  key={p.id}
+                  className="cursor-pointer opacity-80 hover:text-red-500 transition-colors"
+                  onClick={() => handleProductClick(productSlug)}
+                >
+                  <Link
+                    href={`/product/${productSlug}`}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      handleProductClick(productSlug);
+                    }}
+                    className="hover:text-red-500 transition-colors"
+                  >
+                    {p.product_name}
+                  </Link>
+                </li>
+              );
+            })}
           </ul>
         </div>
       </div>
